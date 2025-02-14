@@ -40,6 +40,7 @@ import com.loohp.limbo.events.status.StatusPingEvent;
 import com.loohp.limbo.file.ServerProperties;
 import com.loohp.limbo.inventory.AnvilInventory;
 import com.loohp.limbo.inventory.Inventory;
+import com.loohp.limbo.inventory.InventoryType;
 import com.loohp.limbo.inventory.ItemStack;
 import com.loohp.limbo.location.Location;
 import com.loohp.limbo.network.protocol.packets.ClientboundFinishConfigurationPacket;
@@ -773,13 +774,15 @@ public class ClientConnection extends Thread {
                             Limbo.getInstance().getEventsManager().callEvent(new PlayerInteractEvent(player, PlayerInteractEvent.Action.RIGHT_CLICK_AIR, player.getEquipment().getItem(packet.getHand()), block, packet.getBlockHit().getDirection(), packet.getHand()));
                         } else if (packetIn instanceof PacketPlayInSetCreativeSlot) {
                             PacketPlayInSetCreativeSlot packet = (PacketPlayInSetCreativeSlot) packetIn;
-                            if(packet.getSlotNumber() == -1){
-                                // drop item
-                                return;
-                            }
                             InventoryCreativeEvent event = Limbo.getInstance().getEventsManager().callEvent(new InventoryCreativeEvent(player.getInventoryView(), player.getInventory().getUnsafe().b().applyAsInt(packet.getSlotNumber()), packet.getItemStack()));
                             if (event.isCancelled()) {
                                 player.updateInventory();
+                            } else if (packet.getSlotNumber() == -1) {
+                                // drop item / clone item
+                                if (player.getGamemode() == GameMode.CREATIVE) {
+                                    player.getInventory().setItem(player.getSelectedSlot(), event.getNewItem());
+                                }
+                                return;
                             } else {
                                 player.getInventory().setItem(event.getSlot(), event.getNewItem());
                             }
