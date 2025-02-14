@@ -20,6 +20,7 @@
 package com.loohp.limbo.network;
 
 import com.loohp.limbo.Limbo;
+import com.loohp.limbo.entity.Entity;
 import com.loohp.limbo.entity.EntityEquipment;
 import com.loohp.limbo.events.connection.ConnectionEstablishedEvent;
 import com.loohp.limbo.events.inventory.AnvilRenameInputEvent;
@@ -580,12 +581,12 @@ public class ClientConnection extends Thread {
                 ByteArrayOutputStream brandOut = new ByteArrayOutputStream();
                 DataTypeIO.writeString(new DataOutputStream(brandOut), properties.getServerModName(), StandardCharsets.UTF_8);
                 sendPluginMessage(BRAND_ANNOUNCE_CHANNEL, brandOut.toByteArray());
-                
+
                 SkinResponse skinresponce = (isVelocityModern || isBungeeGuard || isBungeecord) && forwardedSkin != null ? forwardedSkin : MojangAPIUtils.getSkinFromMojangServer(player.getName());
                 PlayerSkinProperty skin = skinresponce != null ? new PlayerSkinProperty(skinresponce.getSkin(), skinresponce.getSignature()) : null;
                 PacketPlayOutPlayerInfo info = new PacketPlayOutPlayerInfo(EnumSet.of(PlayerInfoAction.ADD_PLAYER, PlayerInfoAction.UPDATE_GAME_MODE, PlayerInfoAction.UPDATE_LISTED, PlayerInfoAction.UPDATE_LATENCY, PlayerInfoAction.UPDATE_DISPLAY_NAME), player.getUniqueId(), new PlayerInfoData.PlayerInfoDataAddPlayer(player.getName(), true, Optional.ofNullable(skin), properties.getDefaultGamemode(), 0, false, Optional.empty()));
                 sendPacket(info);
-                
+
                 Set<PlayerAbilityFlags> flags = new HashSet<>();
                 if (properties.isAllowFlight()) {
                     flags.add(PlayerAbilityFlags.FLY);
@@ -595,7 +596,7 @@ public class ClientConnection extends Thread {
                 }
                 PacketPlayOutPlayerAbilities abilities = new PacketPlayOutPlayerAbilities(0.05F, 0.1F, flags.toArray(new PlayerAbilityFlags[flags.size()]));
                 sendPacket(abilities);
-                
+
                 String str = (properties.isLogPlayerIPAddresses() ? inetAddress.getHostName() : "<ip address withheld>") + ":" + clientSocket.getPort() + "|" + player.getName() + "(" + player.getUniqueId() + ")";
                 Limbo.getInstance().getConsole().sendMessage("[/" + str + "] <-> Player had connected to the Limbo server!");
 
@@ -607,25 +608,25 @@ public class ClientConnection extends Thread {
                 if (declare != null) {
                     sendPacket(declare);
                 }
-                
+
                 PacketPlayOutSpawnPosition spawnPos = new PacketPlayOutSpawnPosition(BlockPosition.from(worldSpawn), worldSpawn.getPitch());
                 sendPacket(spawnPos);
-                
+
                 PacketPlayOutPositionAndLook positionLook = new PacketPlayOutPositionAndLook(worldSpawn.getX(), worldSpawn.getY(), worldSpawn.getZ(), worldSpawn.getYaw(), worldSpawn.getPitch(), 1);
                 Limbo.getInstance().getUnsafe().a(player, new Location(world, worldSpawn.getX(), worldSpawn.getY(), worldSpawn.getZ(), worldSpawn.getYaw(), worldSpawn.getPitch()));
                 sendPacket(positionLook);
-                
+
                 player.getDataWatcher().update();
                 PacketPlayOutEntityMetadata show = new PacketPlayOutEntityMetadata(player, false, Player.class.getDeclaredField("skinLayers"));
                 sendPacket(show);
-                
+
                 Limbo.getInstance().getEventsManager().callEvent(new PlayerJoinEvent(player));
-                
+
                 if (properties.isAllowFlight()) {
                     PacketPlayOutGameStateChange state = new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.GameStateChangeEvent.CHANGE_GAME_MODE, player.getGamemode().getId());
                     sendPacket(state);
                 }
-                
+
                 // RESOURCEPACK CODE CONRIBUTED BY GAMERDUCK123
                 if (!properties.getResourcePackLink().equalsIgnoreCase("")) {
                     if (!properties.getResourcePackSHA1().equalsIgnoreCase("")) {
@@ -638,12 +639,12 @@ public class ClientConnection extends Thread {
                 } else {
                     //RESOURCEPACK NOT ENABLED
                 }
-                
+
                 // PLAYER LIST HEADER AND FOOTER CODE CONRIBUTED BY GAMERDUCK123
                 player.sendPlayerListHeaderAndFooter(properties.getTabHeader(), properties.getTabFooter());
-                
+
                 ready = true;
-                
+
                 keepAliveTask = new TimerTask() {
                     @Override
                     public void run() {
@@ -663,7 +664,7 @@ public class ClientConnection extends Thread {
                     }
                 };
                 new Timer().schedule(keepAliveTask, 5000, 10000);
-                
+
                 while (clientSocket.isConnected()) {
                     try {
                         CheckedBiConsumer<PlayerMoveEvent, Location, IOException> processMoveEvent = (event, originalTo) -> {
@@ -772,6 +773,10 @@ public class ClientConnection extends Thread {
                             Limbo.getInstance().getEventsManager().callEvent(new PlayerInteractEvent(player, PlayerInteractEvent.Action.RIGHT_CLICK_AIR, player.getEquipment().getItem(packet.getHand()), block, packet.getBlockHit().getDirection(), packet.getHand()));
                         } else if (packetIn instanceof PacketPlayInSetCreativeSlot) {
                             PacketPlayInSetCreativeSlot packet = (PacketPlayInSetCreativeSlot) packetIn;
+                            if(packet.getSlotNumber() == -1){
+                                // drop item
+                                return;
+                            }
                             InventoryCreativeEvent event = Limbo.getInstance().getEventsManager().callEvent(new InventoryCreativeEvent(player.getInventoryView(), player.getInventory().getUnsafe().b().applyAsInt(packet.getSlotNumber()), packet.getItemStack()));
                             if (event.isCancelled()) {
                                 player.updateInventory();
