@@ -1,18 +1,17 @@
 # LimboService
+
 <img src=".doc/images/map.png" width=200px align="right" alt="Map image">
 
 [![version](https://img.shields.io/github/v/release/YourCraftMC/LimboService)](https://github.com/YourCraftMC/LimboService/releases)
 [![License](https://img.shields.io/github/license/YourCraftMC/LimboService)](https://www.gnu.org/licenses/lgpl-3.0.html)
 [![workflow](https://github.com/YourCraftMC/LimboService/actions/workflows/maven.yml/badge.svg?branch=master)](https://github.com/YourCraftMC/LimboService/actions/workflows/maven.yml)
 
-
-
 🌆 A lightweight & standalone LIMBO service for Minecraft.
 
+> [!NOTE]
+> This project is forked from [LOOHP's Limbo](https://github.com/LOOHP/Limbo),
+> but will be breaking changed and maintained by [YourCraftMC](https://github.com/YourCraftMC).
 
-
-_This project is forked from [LOOHP's Limbo](https://github.com/LOOHP/Limbo),
-but will be breaking changed and maintained by [YourCraftMC](https://github.com/YourCraftMC)._
 
 ## Usage
 
@@ -74,14 +73,15 @@ or other versions from [Releases](https://github.com/YourCraftMC/LimboService/re
 LimboService is a standalone server, and also supports to be used as a library to develop your own plugins.
 
 > [!CAUTION]
-> LimboService is not implemented any Bukkit/Spigot/BungeeCord/Velocity API, 
-> and it's completely not compatible with any plugins of them!
-> 
+> LimboService is **not implemented** any Bukkit/Spigot/BungeeCord/Velocity API,
+> and it's **completely not compatible** and will **never compatible** with any plugins of them!
+>
 > You need to use the provided API to develop your own plugins!
+>
+> **NEVER CREATE ANY ISSUES ABOUT COMPATIBILITY WITH BUKKIT/SPIGOT/VELOCITY!**
 
 You can find packages from [GitHub Packages](https://github.com/orgs/YourCraftMC/packages?repo_name=LimboService).
-
-Remember to replace `VERSION` with the version you're using.
+And remember to replace `VERSION` with the version you're using configs down below.
 
 <details>
 <summary><b>Maven Dependency</b></summary>
