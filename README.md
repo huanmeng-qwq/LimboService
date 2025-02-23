@@ -1,10 +1,15 @@
 # LimboService
+<img src=".doc/images/map.png" width=200px align="right" alt="Map image">
 
 [![version](https://img.shields.io/github/v/release/YourCraftMC/LimboService)](https://github.com/YourCraftMC/LimboService/releases)
 [![License](https://img.shields.io/github/license/YourCraftMC/LimboService)](https://www.gnu.org/licenses/lgpl-3.0.html)
 [![workflow](https://github.com/YourCraftMC/LimboService/actions/workflows/maven.yml/badge.svg?branch=master)](https://github.com/YourCraftMC/LimboService/actions/workflows/maven.yml)
 
+
+
 🌆 A lightweight & standalone LIMBO service for Minecraft.
+
+
 
 _This project is forked from [LOOHP's Limbo](https://github.com/LOOHP/Limbo),
 but will be breaking changed and maintained by [YourCraftMC](https://github.com/YourCraftMC)._
