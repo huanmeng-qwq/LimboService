@@ -27,6 +27,10 @@ or other versions from [Releases](https://github.com/YourCraftMC/LimboService/re
     - Also see `allowlist.yml` for allowing/disallowing players to join.
 4. Join the server with configured host and enjoy the limbo!
 
+LimboService also provides API for developers to create plugins for it,
+if you have any LimboService plugins, you can put them in the `plugins/` directory.
+Or if you want to develop your own plugins, please see the [Development](#development) section.
+
 > [!CAUTION]
 > LimboService is **not implemented** any Bukkit/Spigot/BungeeCord/Velocity API,
 > and it's **completely not compatible** and will **never compatible** with any plugins of them!
@@ -113,6 +117,7 @@ version: 1.0
 author: MyCoolName
 description: A simple plugin for LimboService.
 ```
+
 And... that's it! You can now use the LimboService API to develop your own plugins!
 
 > [!NOTE]
