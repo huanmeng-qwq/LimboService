@@ -12,7 +12,6 @@
 > This project is forked from [LOOHP's Limbo](https://github.com/LOOHP/Limbo),
 > but will be breaking changed and maintained by [YourCraftMC](https://github.com/YourCraftMC).
 
-
 ## Usage
 
 Download latest server jars [here](https://github.com/YourCraftMC/LimboService/releases/latest)
@@ -27,6 +26,14 @@ or other versions from [Releases](https://github.com/YourCraftMC/LimboService/re
 3. Configure settings in `config.yml` and messages in `messages.yml`.
     - Also see `allowlist.yml` for allowing/disallowing players to join.
 4. Join the server with configured host and enjoy the limbo!
+
+> [!CAUTION]
+> LimboService is **not implemented** any Bukkit/Spigot/BungeeCord/Velocity API,
+> and it's **completely not compatible** and will **never compatible** with any plugins of them!
+>
+> You need to use the provided API to develop your own plugins!
+>
+> **NEVER CREATE ANY ISSUES ABOUT COMPATIBILITY WITH BUKKIT/SPIGOT/VELOCITY!**
 
 ### Built-in commands
 
@@ -70,18 +77,48 @@ or other versions from [Releases](https://github.com/YourCraftMC/LimboService/re
 
 ## Development
 
-LimboService is a standalone server, and also supports to be used as a library to develop your own plugins.
+LimboService also supports to be used as a library to develop your own plugins, just like Bukkit/Spigot does.
 
-> [!CAUTION]
-> LimboService is **not implemented** any Bukkit/Spigot/BungeeCord/Velocity API,
-> and it's **completely not compatible** and will **never compatible** with any plugins of them!
->
-> You need to use the provided API to develop your own plugins!
->
-> **NEVER CREATE ANY ISSUES ABOUT COMPATIBILITY WITH BUKKIT/SPIGOT/VELOCITY!**
+Here is a simple and minimal example to create a plugin for LimboService:
 
-You can find packages from [GitHub Packages](https://github.com/orgs/YourCraftMC/packages?repo_name=LimboService).
-And remember to replace `VERSION` with the version you're using configs down below.
+```java
+package com.example.myplugin;
+
+import com.loohp.limbo.plugins.LimboPlugin;
+
+public class MyPlugin extends LimboPlugin {
+    @Override
+    public void onLoad() {
+        // Called when the plugin is loading
+    }
+
+    @Override
+    public void onEnable() {
+        // Called when the plugin is enabling
+    }
+
+    @Override
+    public void onDisable() {
+        // Called when the plugin is disabling
+    }
+}
+```
+
+And you need to create a `plugin.yml` or `limbo.yml` file in the resources directory:
+
+```yaml
+main: com.example.myplugin.MyPlugin
+name: MyPlugin
+version: 1.0
+author: MyCoolName
+description: A simple plugin for LimboService.
+```
+And... that's it! You can now use the LimboService API to develop your own plugins!
+
+> [!NOTE]
+> You can find maven packages
+> at [GitHub Packages](https://github.com/orgs/YourCraftMC/packages?repo_name=LimboService).
+> And remember to replace `VERSION` with the version you're using configs down below.
 
 <details>
 <summary><b>Maven Dependency</b></summary>
