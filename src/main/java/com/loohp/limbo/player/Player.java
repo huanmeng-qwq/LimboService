@@ -301,7 +301,10 @@ public class Player extends LivingEntity implements CommandSender, InventoryHold
 
     public void chat(String message, boolean verbose, byte[] saltSignature, Instant time) {
         String format = ServerConfig.PLAYER.CHAT_FORMAT.get();
-        if (format == null || format.isEmpty()) return;
+        if (format == null || format.isEmpty()) {
+            ServerMessages.CHAT_DISABLED.sendTo(this);
+            return;
+        }
 
         PlayerChatEvent event = Limbo.getInstance().getEventsManager().callEvent(new PlayerChatEvent(this, format, message, false));
         if (event.isCancelled()) return;

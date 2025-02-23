@@ -19,5 +19,9 @@ public interface ServerMessages extends Configuration {
             "&cYou do not have permission to chat!"
     ).build();
 
+    ConfiguredMessage CHAT_DISABLED = create().defaults(
+            "&c&lOh... &fSeems like no voices here..."
+    ).build();
+
 
 }
