@@ -255,7 +255,6 @@ public class ClientSessionPacketHandler extends SessionAdapter {
                 if (player.getGamemode() == GameMode.CREATIVE) {
                     player.getInventory().setItem(player.getSelectedSlot(), event.getNewItem());
                 }
-                return;
             } else {
                 player.getInventory().setItem(event.getSlot(), event.getNewItem());
             }

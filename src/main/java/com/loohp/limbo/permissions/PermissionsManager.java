@@ -34,8 +34,8 @@ import java.util.Map;
 
 public class PermissionsManager {
 	
-	private Map<String, List<String>> users;
-	private Map<String, List<String>> permissions;
+	private final Map<String, List<String>> users;
+	private final Map<String, List<String>> permissions;
 	
 	public PermissionsManager() {
 		users = new HashMap<>();

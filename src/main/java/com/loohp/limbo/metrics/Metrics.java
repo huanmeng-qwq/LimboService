@@ -31,6 +31,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.zip.GZIPOutputStream;
@@ -94,7 +95,7 @@ public class Metrics {
             }
         }
 
-        limboVersion = Limbo.getInstance().LIMBO_IMPLEMENTATION_VERSION;
+        limboVersion = Limbo.LIMBO_IMPLEMENTATION_VERSION;
 
         // Load the data
         serverUUID = config.get("serverUuid", String.class);
@@ -120,7 +121,7 @@ public class Metrics {
         addCustomChart(new Metrics.SimplePie("minecraftVersion", new Callable<String>() {
             @Override
             public String call() throws Exception {
-                return Limbo.getInstance().SERVER_IMPLEMENTATION_VERSION;
+                return Limbo.SERVER_IMPLEMENTATION_VERSION;
             }
         }));
     }
@@ -269,7 +270,7 @@ public class Metrics {
         }
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         GZIPOutputStream gzip = new GZIPOutputStream(outputStream);
-        gzip.write(str.getBytes("UTF-8"));
+        gzip.write(str.getBytes(StandardCharsets.UTF_8));
         gzip.close();
         return outputStream.toByteArray();
     }
@@ -952,8 +953,8 @@ public class Metrics {
         ZAMBIA("ZM", "Zambia"),
         ZIMBABWE("ZW", "Zimbabwe");
 
-        private String isoTag;
-        private String name;
+        private final String isoTag;
+        private final String name;
 
         Country(String isoTag, String name) {
             this.isoTag = isoTag;

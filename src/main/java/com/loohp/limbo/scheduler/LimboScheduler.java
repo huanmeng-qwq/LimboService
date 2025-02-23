@@ -34,10 +34,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class LimboScheduler {
 	
-	private AtomicInteger idProvider = new AtomicInteger(0);
-	private Map<Long, List<LimboSchedulerTask>> registeredTasks = new HashMap<>();
-	private Map<Integer, LimboSchedulerTask> tasksById = new HashMap<>();
-	private Set<Integer> cancelledTasks = new HashSet<>();
+	private final AtomicInteger idProvider = new AtomicInteger(0);
+	private final Map<Long, List<LimboSchedulerTask>> registeredTasks = new HashMap<>();
+	private final Map<Integer, LimboSchedulerTask> tasksById = new HashMap<>();
+	private final Set<Integer> cancelledTasks = new HashSet<>();
 	
 	public LimboScheduler() {
 		
@@ -202,8 +202,8 @@ public class LimboScheduler {
 	
 	public static class CurrentSchedulerTask {
 		
-		private List<LimboSchedulerTask> asyncTasks;
-		private List<LimboSchedulerTask> syncedTasks;
+		private final List<LimboSchedulerTask> asyncTasks;
+		private final List<LimboSchedulerTask> syncedTasks;
 		
 		public CurrentSchedulerTask(List<LimboSchedulerTask> syncedTasks, List<LimboSchedulerTask> asyncTasks) {
 			this.asyncTasks = asyncTasks;
@@ -222,11 +222,11 @@ public class LimboScheduler {
 	
 	public static class LimboSchedulerTask {
 		
-		private int taskId;
-		private LimboPlugin plugin;
-		private LimboTask task;
-		private LimboSchedulerTaskType type;
-		private long period;
+		private final int taskId;
+		private final LimboPlugin plugin;
+		private final LimboTask task;
+		private final LimboSchedulerTaskType type;
+		private final long period;
 		
 		private LimboSchedulerTask(LimboPlugin plugin, LimboTask task, int taskId, LimboSchedulerTaskType type, long period) {
 			this.plugin = plugin;
@@ -258,13 +258,13 @@ public class LimboScheduler {
 		
 	}
 	
-	public static enum LimboSchedulerTaskType {
+	public enum LimboSchedulerTaskType {
 		
 		SYNC,
 		ASYNC,
 		TIMER_SYNC,
-		TIMER_ASYNC;
-		
-	}
+		TIMER_ASYNC
+
+    }
 
 }

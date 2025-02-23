@@ -29,7 +29,55 @@ or other versions from [Releases](https://github.com/YourCraftMC/LimboService/re
     - Also see `allowlist.yml` for allowing/disallowing players to join.
 4. Join the server with configured host and enjoy the limbo!
 
+### Built-in commands
+
+```text
+# version
+@ limbo.command.version
+- Show the version of the server.
+
+# spawn [player]
+@ limbo.command.spawn / limbo.command.spawn.others
+- Teleport a player to the spawn point.
+
+# say <message>
+@ limbo.command.say
+- Broadcast a message to all players.
+
+# gamemode <mode> [player]
+@ limbo.command.gamemode / limbo.command.gamemode.others
+- Change the gamemode of a player.
+
+# allowlist toggle
+@ limbo.command.allowlist
+- Toggle the list between "allowlist" and "denylist".
+
+# allowlist <add|remove> <player>
+@ limbo.command.allowlist
+- Add or remove a player from the allowlist.
+
+# allowlist reload
+@ limbo.command.allowlist
+- Reload the allowlist.
+
+# kick <player> [reason]
+@ limbo.command.kick
+- Kick a player from the server.
+
+# stop
+@ limbo.command.stop
+- Stop the server.
+```
+
 ## Development
+
+LimboService is a standalone server, and also supports to be used as a library to develop your own plugins.
+
+> [!CAUTION]
+> LimboService is not implemented any Bukkit/Spigot/BungeeCord/Velocity API, 
+> and it's completely not compatible with any plugins of them!
+> 
+> You need to use the provided API to develop your own plugins!
 
 You can find packages from [GitHub Packages](https://github.com/orgs/YourCraftMC/packages?repo_name=LimboService).
 

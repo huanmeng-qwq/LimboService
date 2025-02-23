@@ -204,12 +204,12 @@ public class ChunkUtil {
     public static Object convert(CompoundTag original) {
 
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-             NBTOutputStream stream = new NBTOutputStream(outputStream);) {
+             NBTOutputStream stream = new NBTOutputStream(outputStream)) {
             stream.writeTag(original, Integer.MAX_VALUE);
             stream.flush();
             try (ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
                  DataInputStream input = new DataInputStream(inputStream);
-                 NBTInputStream nbtInputStream = new NBTInputStream(input);) {
+                 NBTInputStream nbtInputStream = new NBTInputStream(input)) {
                 return nbtInputStream.readTag(Integer.MAX_VALUE);
             }
         } catch (IOException e) {

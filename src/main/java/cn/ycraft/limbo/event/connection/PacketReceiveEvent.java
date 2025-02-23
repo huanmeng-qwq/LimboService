@@ -8,8 +8,8 @@ import org.geysermc.mcprotocollib.network.packet.Packet;
 
 public class PacketReceiveEvent extends Event implements Cancellable {
     private boolean cancelled;
-    private ClientConnection connection;
-    private Packet packet;
+    private final ClientConnection connection;
+    private final Packet packet;
 
     public PacketReceiveEvent(ClientConnection connection, Packet packet) {
         this.connection = connection;

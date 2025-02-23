@@ -103,7 +103,7 @@ public abstract class BuiltInRegistries {
 
     public static class BlockEntityRegistry extends BuiltInRegistries {
 
-        private Map<Key, Integer> blockEntityType;
+        private final Map<Key, Integer> blockEntityType;
 
         private BlockEntityRegistry(Map<Key, Integer> blockEntityType) {
             this.blockEntityType = blockEntityType;

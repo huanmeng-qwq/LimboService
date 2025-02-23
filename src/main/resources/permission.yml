@@ -1,13 +1,15 @@
 groups:
   admin:
-    - limboserver.stop
-    - limboserver.kick
-    - limboserver.say
-    - limboserver.gamemode
-    - limboserver.version
+    - limbo.command.version
+    - limbo.command.stop
+    - limbo.command.kick
+    - limbo.command.say
+    - limbo.command.gamemode
+    - limbo.command.gamemode.others
+    - limbo.command.spawn.others
   default:
-    - limboserver.spawn
-    - limboserver.chat
+    - limbo.command.spawn
+    - limbo.command.chat
 
 players:
   LOOHP: 

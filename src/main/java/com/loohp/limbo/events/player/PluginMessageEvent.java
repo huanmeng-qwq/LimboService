@@ -26,8 +26,8 @@ import java.util.Arrays;
 
 public class PluginMessageEvent extends PlayerEvent {
 
-    private String channel;
-    private byte[] data;
+    private final String channel;
+    private final byte[] data;
 
     public PluginMessageEvent(Player player, String channel, byte[] data) {
         super(player);

@@ -76,7 +76,7 @@ public final class Limbo {
     public static final String LIMBO_BRAND = "Limbo";
     private static Limbo instance;
 
-    public static void main(String args[]) throws IOException, ParseException, NumberFormatException, ClassNotFoundException, InterruptedException {
+    public static void main(String[] args) throws IOException, ParseException, NumberFormatException, ClassNotFoundException, InterruptedException {
         new Limbo();
     }
 
@@ -113,7 +113,7 @@ public final class Limbo {
     public final AtomicInteger entityIdCount = new AtomicInteger();
 
     @SuppressWarnings("deprecation")
-    private Unsafe unsafe;
+    private final Unsafe unsafe;
 
     private final ConfigurationHolder<?> configHolder;
     private final ConfigurationHolder<?> messsageHolder;
@@ -227,6 +227,18 @@ public final class Limbo {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public ConfigurationHolder<?> getConfigHolder() {
+        return configHolder;
+    }
+
+    public ConfigurationHolder<?> getMessageHolder() {
+        return messsageHolder;
+    }
+
+    public ConfigurationHolder<?> getAllowlistHolder() {
+        return allowlistHolder;
     }
 
     @Deprecated
@@ -409,10 +421,10 @@ public final class Limbo {
 
     public String buildLegacyPingResponse(String version, Component motd, int maxPlayers, int playersOnline) {
         String begin = "�1";
-        return String.join("\00", begin, "127", version, String.join("", Arrays.asList(motd).stream().map(each -> LegacyComponentSerializer.legacySection().serialize(each)).collect(Collectors.toList())), String.valueOf(playersOnline), String.valueOf(maxPlayers));
+        return String.join("\00", begin, "127", version, String.join("", Collections.singletonList(motd).stream().map(each -> LegacyComponentSerializer.legacySection().serialize(each)).collect(Collectors.toList())), String.valueOf(playersOnline), String.valueOf(maxPlayers));
     }
 
-    protected void terminate() {
+    private void terminate() {
         isRunning.set(false);
         console.sendMessage("Stopping Server...");
 

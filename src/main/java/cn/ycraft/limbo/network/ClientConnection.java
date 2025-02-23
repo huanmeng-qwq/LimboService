@@ -41,7 +41,7 @@ public class ClientConnection extends SessionAdapter {
     public static final String BRAND_ANNOUNCE_CHANNEL = Key.key("brand").toString();
 
     private final Session session;
-    private AtomicLong lastPacketTimestamp;
+    private final AtomicLong lastPacketTimestamp;
     private SocketAddress inetAddress;
 
     public ClientConnection(Session session) {

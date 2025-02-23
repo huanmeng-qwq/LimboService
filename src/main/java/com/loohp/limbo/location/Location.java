@@ -25,6 +25,8 @@ import com.loohp.limbo.utils.NumberConversions;
 import com.loohp.limbo.world.BlockState;
 import com.loohp.limbo.world.World;
 
+import java.util.Objects;
+
 public class Location implements Cloneable {
 
     private World world;
@@ -455,7 +457,7 @@ public class Location implements Cloneable {
 
         World world = (this.world == null) ? null : this.world;
         World otherWorld = (other.world == null) ? null : other.world;
-        if (world != otherWorld && (world == null || !world.equals(otherWorld))) {
+        if (!Objects.equals(world, otherWorld)) {
             return false;
         }
         if (Double.doubleToLongBits(this.x) != Double.doubleToLongBits(other.x)) {
@@ -470,10 +472,7 @@ public class Location implements Cloneable {
         if (Float.floatToIntBits(this.pitch) != Float.floatToIntBits(other.pitch)) {
             return false;
         }
-        if (Float.floatToIntBits(this.yaw) != Float.floatToIntBits(other.yaw)) {
-            return false;
-        }
-        return true;
+        return Float.floatToIntBits(this.yaw) == Float.floatToIntBits(other.yaw);
     }
 
     @Override

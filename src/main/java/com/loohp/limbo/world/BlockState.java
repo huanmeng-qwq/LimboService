@@ -32,7 +32,7 @@ import java.util.Objects;
 
 public class BlockState {
 	
-	private CompoundTag tag;
+	private final CompoundTag tag;
 	
 	public BlockState(CompoundTag tag) {
 		this.tag = tag;
@@ -77,7 +77,7 @@ public class BlockState {
 	
 	public <T> void setProperty(String key, T value) {
 		CompoundTag properties = tag.getCompoundTag("Properties");
-		properties.putString(key, ((T) value).toString());
+		properties.putString(key, value.toString());
 	}
 
 	@Override

@@ -32,9 +32,9 @@ public class InventoryClickEvent extends InventoryEvent implements Cancellable {
 	private boolean cancelled;
 	private final ClickType click;
 	private final InventoryAction action;
-	private InventoryType.SlotType type;
-	private int whichSlot;
-	private int rawSlot;
+	private final InventoryType.SlotType type;
+	private final int whichSlot;
+	private final int rawSlot;
 	private ItemStack current;
 	private int hotbarKey;
 

@@ -51,7 +51,7 @@ public class YamlOrder extends PropertyUtils {
     private boolean allowReadOnlyProperties = false;
     private boolean skipMissingProperties = false;
 
-    private PlatformFeatureDetector platformFeatureDetector;
+    private final PlatformFeatureDetector platformFeatureDetector;
 
     public YamlOrder() {
         this(new PlatformFeatureDetector());

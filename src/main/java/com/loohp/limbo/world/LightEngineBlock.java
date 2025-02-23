@@ -25,7 +25,7 @@ import java.util.List;
 
 public class LightEngineBlock extends LightEngine {
 	
-	private World world;
+	private final World world;
 	private byte[][][] blockLightArray;
 	
 	public LightEngineBlock(World world) {

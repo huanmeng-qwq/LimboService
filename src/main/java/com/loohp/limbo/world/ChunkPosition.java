@@ -25,9 +25,9 @@ import net.querz.mca.Chunk;
 
 public class ChunkPosition {
 	
-	private World world;
-	private int x;
-	private int z;
+	private final World world;
+	private final int x;
+	private final int z;
 	
 	public ChunkPosition(World world, int chunkX, int chunkZ) {
 		this.world = world;
@@ -91,10 +91,7 @@ public class ChunkPosition {
 		if (x != other.x) {
 			return false;
 		}
-		if (z != other.z) {
-			return false;
-		}
-		return true;
-	}
+        return z == other.z;
+    }
 
 }

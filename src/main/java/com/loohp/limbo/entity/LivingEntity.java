@@ -90,7 +90,7 @@ public abstract class LivingEntity extends Entity {
 		} else if (activeHand.equals(EquipmentSlot.OFFHAND)) {
 			this.activeHand = true;
 		} else {
-			throw new IllegalArgumentException("Invalid EquipmentSlot " + activeHand.toString());
+			throw new IllegalArgumentException("Invalid EquipmentSlot " + activeHand);
 		}
 	}
 

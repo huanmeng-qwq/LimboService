@@ -25,7 +25,7 @@ import org.geysermc.mcprotocollib.protocol.data.game.ResourcePackStatus;
 
 public class PlayerResourcePackStatusEvent extends PlayerEvent {
 
-    private ResourcePackStatus status;
+    private final ResourcePackStatus status;
 
     public PlayerResourcePackStatusEvent(Player player, ResourcePackStatus status) {
         super(player);

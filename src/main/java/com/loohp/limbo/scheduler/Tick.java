@@ -35,10 +35,10 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Tick {
 
     private int tickingInterval;
-    private AtomicLong tick = new AtomicLong(0);
+    private final AtomicLong tick = new AtomicLong(0);
 
-    private List<Thread> threads = new ArrayList<>();
-    private Queue<LimboSchedulerTask> asyncTasksQueue = new ConcurrentLinkedQueue<>();
+    private final List<Thread> threads = new ArrayList<>();
+    private final Queue<LimboSchedulerTask> asyncTasksQueue = new ConcurrentLinkedQueue<>();
 
     public Tick(Limbo instance) {
         new Thread(() -> {

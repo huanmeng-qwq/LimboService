@@ -24,11 +24,11 @@ import com.loohp.limbo.file.FileConfiguration;
 
 public class PluginInfo {
 	
-	private String name;
-	private String description;
-	private String author;
-	private String version;
-	private String main;
+	private final String name;
+	private final String description;
+	private final String author;
+	private final String version;
+	private final String main;
 	
 	public PluginInfo(FileConfiguration file) {
 		name = file.get("name", String.class);

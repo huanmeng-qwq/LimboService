@@ -26,7 +26,7 @@ import net.kyori.adventure.text.Component;
 
 public class StatusPingEvent extends Event {
 
-	private ClientConnection connection;
+	private final ClientConnection connection;
 	private String version;
 	private int protocol;
 	private Component motd;

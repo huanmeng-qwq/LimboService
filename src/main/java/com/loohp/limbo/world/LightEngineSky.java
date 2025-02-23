@@ -25,7 +25,7 @@ import java.util.List;
 
 public class LightEngineSky extends LightEngine {
 	
-	private World world;
+	private final World world;
 	private byte[][][] skyLightArray;
 	
 	public LightEngineSky(World world) {

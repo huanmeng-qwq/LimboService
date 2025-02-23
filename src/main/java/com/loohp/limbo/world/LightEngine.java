@@ -25,7 +25,7 @@ import java.util.Map;
 
 public abstract class LightEngine {
 	
-	private static Map<String, Byte> blockLightLevelMapping = new HashMap<>();
+	private static final Map<String, Byte> blockLightLevelMapping = new HashMap<>();
 	
 	static {
 		blockLightLevelMapping.put("minecraft:beacon", (byte) 15);

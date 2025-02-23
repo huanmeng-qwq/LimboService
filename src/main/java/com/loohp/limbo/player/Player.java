@@ -302,7 +302,7 @@ public class Player extends LivingEntity implements CommandSender, InventoryHold
     public void chat(String message, boolean verbose, byte[] saltSignature, Instant time) {
         String format = ServerConfig.PLAYER.CHAT_FORMAT.get();
         if (format == null || format.isEmpty()) {
-            ServerMessages.CHAT_DISABLED.sendTo(this);
+            ServerMessages.CHAT.DISABLED.sendTo(this);
             return;
         }
 
@@ -310,7 +310,7 @@ public class Player extends LivingEntity implements CommandSender, InventoryHold
         if (event.isCancelled()) return;
 
         if (!hasPermission("limboserver.chat")) {
-            ServerMessages.NO_CHAT_PERMISSION.sendTo(this);
+            ServerMessages.CHAT.DISALLOWED.sendTo(this);
             return;
         }
 

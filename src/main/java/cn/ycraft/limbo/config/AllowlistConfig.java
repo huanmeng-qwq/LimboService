@@ -20,6 +20,10 @@ public interface AllowlistConfig extends Configuration {
         return REVERSED.resolve() != (containsName || containsUUID);
     }
 
+    static int size() {
+        return BY_NAME.get().size() + BY_UUID.get().size();
+    }
+
     @HeaderComments({
             "Whether to reverse the allowlist,",
             " if true, will make this an exclusion list or \"banned list\".",

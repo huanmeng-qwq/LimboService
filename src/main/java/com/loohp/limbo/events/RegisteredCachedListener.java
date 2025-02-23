@@ -31,8 +31,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class RegisteredCachedListener {
 	
-	private LimboPlugin plugin;
-	private Map<Class<? extends Event>, Map<EventPriority, List<Method>>> listeners;
+	private final LimboPlugin plugin;
+	private final Map<Class<? extends Event>, Map<EventPriority, List<Method>>> listeners;
 	
 	@SuppressWarnings("unchecked")
 	public RegisteredCachedListener(LimboPlugin plugin, Listener listener) {

@@ -83,7 +83,7 @@ public class DataComponentType<T> {
         }
 
         public Tag<?> encode(T t) {
-            return encode.apply((T) t);
+            return encode.apply(t);
         }
 
         public T decode(Tag<?> tag) {

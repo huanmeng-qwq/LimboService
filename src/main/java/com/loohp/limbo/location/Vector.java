@@ -35,7 +35,7 @@ import java.util.Random;
  */
 public class Vector implements Cloneable {
 
-    private static Random random = new Random();
+    private static final Random random = new Random();
 
     /**
      * Threshold for fuzzy equals().

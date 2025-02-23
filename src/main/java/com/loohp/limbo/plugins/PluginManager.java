@@ -24,7 +24,7 @@ import com.loohp.limbo.Limbo;
 import com.loohp.limbo.commands.CommandExecutor;
 import com.loohp.limbo.commands.CommandSender;
 import com.loohp.limbo.commands.DefaultCommands;
-import com.loohp.limbo.commands.TabCompletor;
+import com.loohp.limbo.commands.TabCompleter;
 import com.loohp.limbo.file.FileConfiguration;
 
 import java.io.File;
@@ -38,9 +38,9 @@ import java.util.zip.ZipInputStream;
 public class PluginManager {
 
     private final Map<String, LimboPlugin> plugins;
-    private DefaultCommands defaultExecutor;
-    private List<Executor> executors;
-    private File pluginFolder;
+    private final DefaultCommands defaultExecutor;
+    private final List<Executor> executors;
+    private final File pluginFolder;
 
     public PluginManager(DefaultCommands defaultExecutor, File pluginFolder) {
         this.defaultExecutor = defaultExecutor;
@@ -100,14 +100,10 @@ public class PluginManager {
         return plugins.get(name);
     }
 
-    public void fireExecutors(CommandSender sender, String[] args) throws Exception {
+    public void fireExecutors(CommandSender sender, String[] args) {
+        if (args.length == 0) return;
+
         Limbo.getInstance().getConsole().sendMessage(sender.getName() + " executed server command: /" + String.join(" ", args));
-        try {
-            defaultExecutor.execute(sender, args);
-        } catch (Exception e) {
-            System.err.println("Error while running default command \"" + args[0] + "\"");
-            e.printStackTrace();
-        }
         for (Executor entry : executors) {
             try {
                 entry.executor.execute(sender, args);
@@ -115,6 +111,14 @@ public class PluginManager {
                 System.err.println("Error while passing command \"" + args[0] + "\" to the plugin \"" + entry.plugin.getName() + "\"");
                 e.printStackTrace();
             }
+        }
+
+        //Execute default commands to be executed if no plugin command is found
+        try {
+            defaultExecutor.execute(sender, args);
+        } catch (Exception e) {
+            System.err.println("Error while running default command \"" + args[0] + "\"");
+            e.printStackTrace();
         }
     }
 
@@ -151,16 +155,20 @@ public class PluginManager {
         return new File(pluginFolder.getAbsolutePath());
     }
 
+    public DefaultCommands getDefaultExecutor() {
+        return defaultExecutor;
+    }
+
     protected static class Executor {
         public LimboPlugin plugin;
         public CommandExecutor executor;
-        public Optional<TabCompletor> tab;
+        public Optional<TabCompleter> tab;
 
         public Executor(LimboPlugin plugin, CommandExecutor executor) {
             this.plugin = plugin;
             this.executor = executor;
-            if (executor instanceof TabCompletor) {
-                this.tab = Optional.of((TabCompletor) executor);
+            if (executor instanceof TabCompleter) {
+                this.tab = Optional.of((TabCompleter) executor);
             } else {
                 this.tab = Optional.empty();
             }

@@ -32,8 +32,8 @@ import java.util.Map.Entry;
 
 public class DataWatcher {
 	
-	private Entity entity;
-	private Map<Field, WatchableObject> values;
+	private final Entity entity;
+	private final Map<Field, WatchableObject> values;
 	
 	public DataWatcher(Entity entity) {
 		this.entity = entity;
@@ -88,11 +88,11 @@ public class DataWatcher {
 	
 	public static class WatchableObject {
 		
-		private int index;
-		private WatchableObjectType type;
-		private boolean optional;
-		private boolean isBitmask;
-		private int bitmask;
+		private final int index;
+		private final WatchableObjectType type;
+		private final boolean optional;
+		private final boolean isBitmask;
+		private final int bitmask;
 		
 		private Object value;
 		
@@ -148,7 +148,7 @@ public class DataWatcher {
 	
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.FIELD)
-	public static @interface WatchableField {
+	public @interface WatchableField {
 		int MetadataIndex();
 		WatchableObjectType WatchableObjectType();
 		boolean IsOptional() default false;
@@ -156,7 +156,7 @@ public class DataWatcher {
 		int Bitmask() default 0x00;
 	}
 	
-	public static enum WatchableObjectType {
+	public enum WatchableObjectType {
 		BYTE(0), 
 		VARINT(1, 17), 
 		FLOAT(2), 

@@ -125,9 +125,6 @@ public class LimboServerListener extends ServerListener {
                                     }
 
                                     switch (state) {
-                                        default:
-                                            Limbo.getInstance().getConsole().sendMessage(i + ": ignore data: State: " + state);
-                                            break;
                                         case 0:
                                             host = data[i];
                                             state = 1;
@@ -150,6 +147,9 @@ public class LimboServerListener extends ServerListener {
                                         case 4:
                                             skinData = data[i];
                                             state = 6;
+                                            break;
+                                        default:
+                                            Limbo.getInstance().getConsole().sendMessage(i + ": ignore data: State: " + state);
                                             break;
                                     }
                                 }

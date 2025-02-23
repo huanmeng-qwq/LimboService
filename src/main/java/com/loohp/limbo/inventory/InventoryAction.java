@@ -91,5 +91,4 @@ public enum InventoryAction {
      * An unrecognized ClickType.
      */
     UNKNOWN,
-    ;
 }

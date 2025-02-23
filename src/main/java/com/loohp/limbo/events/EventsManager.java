@@ -31,8 +31,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class EventsManager {
 	
-	private List<ListenerPair> listeners;
-	private Map<Listener, RegisteredCachedListener> cachedListeners;
+	private final List<ListenerPair> listeners;
+	private final Map<Listener, RegisteredCachedListener> cachedListeners;
 	
 	public EventsManager() {
 		listeners = new ArrayList<>();

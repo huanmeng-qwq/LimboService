@@ -63,9 +63,9 @@ public class Environment {
 	
 	//=========================
 	
-	private Key key;
-	private boolean hasSkyLight;
-	private int id;
+	private final Key key;
+	private final boolean hasSkyLight;
+	private final int id;
 	
 	private Environment(Key key, boolean hasSkyLight, int id) {
 		this.key = key;
@@ -106,14 +106,9 @@ public class Environment {
 			return false;
 		}
 		if (key == null) {
-			if (other.key != null) {
-				return false;
-			}
-		} else if (!key.equals(other.key)) {
-			return false;
-		}
-		return true;
-	}
+            return other.key == null;
+		} else return key.equals(other.key);
+    }
 
 	public int getId() {
 		return id;

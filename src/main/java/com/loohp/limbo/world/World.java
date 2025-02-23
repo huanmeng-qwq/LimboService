@@ -70,14 +70,14 @@ public class World {
 		EMPTY_CHUNK.setTileEntities(new ListTag<CompoundTag>(CompoundTag.class));
 	}
 	
-	private String name;
-	private Environment environment;
-	private Chunk[][] chunks;
-	private int width;
-	private int length;
-	private LightEngineBlock lightEngineBlock;
+	private final String name;
+	private final Environment environment;
+	private final Chunk[][] chunks;
+	private final int width;
+	private final int length;
+	private final LightEngineBlock lightEngineBlock;
 	private LightEngineSky lightEngineSky;
-	private Map<Entity, DataWatcher> entities;
+	private final Map<Entity, DataWatcher> entities;
 
 	public World(String name, int width, int length, Environment environment) {
 		this.name = name;

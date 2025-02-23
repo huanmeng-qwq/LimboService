@@ -51,7 +51,7 @@ public class ServerConnection {
     private final int port;
     private final boolean onlineMode;
     private final boolean silent;
-    private Map<Session, ClientConnection> clients;
+    private final Map<Session, ClientConnection> clients;
 
     private NetworkServer server;
 
@@ -134,7 +134,7 @@ public class ServerConnection {
                     new StatusPingEvent(
                             getClient(session),
                             ServerConfig.SERVER.VERSION.resolve(),
-                            Limbo.getInstance().SERVER_IMPLEMENTATION_PROTOCOL,
+                            Limbo.SERVER_IMPLEMENTATION_PROTOCOL,
                             GsonComponentSerializer.gson().deserialize(ServerConfig.SERVER.MOTD.resolve()),
                             ServerConfig.SERVER.MAX_PLAYERS.resolve(),
                             Limbo.getInstance().getPlayers().size(),

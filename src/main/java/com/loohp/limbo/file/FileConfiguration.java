@@ -111,7 +111,7 @@ public class FileConfiguration {
 			map = map1;
 		}
 		if (value != null) {
-			map.put(tree[tree.length - 1], (T) value); 
+			map.put(tree[tree.length - 1], value);
 		} else {
 			map.remove(tree[tree.length - 1]);
 		}

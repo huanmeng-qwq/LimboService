@@ -22,6 +22,6 @@ package com.loohp.limbo.inventory;
 
 public enum InventoryClickType {
 
-    PICKUP, QUICK_MOVE, SWAP, CLONE, THROW, QUICK_CRAFT, PICKUP_ALL;
+    PICKUP, QUICK_MOVE, SWAP, CLONE, THROW, QUICK_CRAFT, PICKUP_ALL
 
 }

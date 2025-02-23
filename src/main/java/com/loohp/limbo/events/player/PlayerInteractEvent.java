@@ -35,9 +35,9 @@ public class PlayerInteractEvent extends PlayerEvent implements Cancellable {
 		LEFT_CLICK_BLOCK,
 		PHYSICAL,
 		RIGHT_CLICK_AIR,
-		RIGHT_CLICK_BLOCK;
+		RIGHT_CLICK_BLOCK
 
-	}
+    }
 
 	private boolean cancelled = false;
 	private final Action action;

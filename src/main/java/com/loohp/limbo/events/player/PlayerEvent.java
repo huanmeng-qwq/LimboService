@@ -25,7 +25,7 @@ import com.loohp.limbo.player.Player;
 
 public class PlayerEvent extends Event {
 	
-	private Player player;
+	private final Player player;
 	
 	public PlayerEvent(Player player) {
 		this.player = player;
