@@ -153,9 +153,6 @@ public class ClientSessionPacketHandler extends SessionAdapter {
         InetSocketAddress inetAddress = (InetSocketAddress) session.getRemoteAddress();
 
         Limbo.getInstance().getEventsManager().callEvent(new PlayerQuitEvent(player));
-
-        String str = (ServerConfig.LOG_PLAYER_IP_ADDRESSES.getNotNull() ? inetAddress.getHostName() : "<ip address withheld>") + ":" + inetAddress.getPort() + "|" + player.getName();
-        Limbo.getInstance().getConsole().sendMessage("[/" + str + "] <-> Player had disconnected!");
         Limbo.getInstance().getUnsafe().b(player);
         Limbo.getInstance().getServerConnection().getClients().remove(session);
         if (event.getCause() != null) {
@@ -318,7 +315,7 @@ public class ClientSessionPacketHandler extends SessionAdapter {
             ServerboundResourcePackPacket rpcheck = (ServerboundResourcePackPacket) packet;
             // Pass on result to the events
             Limbo.getInstance().getEventsManager().callEvent(new PlayerResourcePackStatusEvent(player, rpcheck.getStatus()));
-            if (rpcheck.getStatus() == ResourcePackStatus.DECLINED && ServerConfig.REQUIRED_RESOURCE_PACK.getNotNull()) {
+            if (rpcheck.getStatus() == ResourcePackStatus.DECLINED && ServerConfig.RESOURCE_PACK.FORCE.resolve()) {
                 player.disconnect(Component.translatable("multiplayer.requiredTexturePrompt.disconnect"));
             }
         }

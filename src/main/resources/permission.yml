@@ -4,10 +4,10 @@ groups:
     - limboserver.kick
     - limboserver.say
     - limboserver.gamemode
+    - limboserver.version
   default:
     - limboserver.spawn
     - limboserver.chat
-    - limboserver.version
 
 players:
   LOOHP: 

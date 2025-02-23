@@ -54,7 +54,7 @@ public class LimboServerListener extends ServerListener {
             if (packet instanceof ServerboundHelloPacket) {
                 ServerboundHelloPacket helloPacket = (ServerboundHelloPacket) packet;
                 $setUsername(helloPacket.getUsername());
-                boolean isVelocityModern = ServerConfig.VELOCITY_MODERN.getNotNull();
+                boolean isVelocityModern = ServerConfig.PROXY.VELOCITY_MODERN.resolve();
 
                 if (isVelocityModern) {
                     session.send(new ClientboundCustomQueryPacket(session.getFlag(NetworkConstants.FORWARD_FLAG).id, Key.key("velocity", "player_info"), new byte[]{}));
@@ -98,8 +98,8 @@ public class LimboServerListener extends ServerListener {
         }
         if (protocol.getInboundState() == ProtocolState.HANDSHAKE) {
             if (packet instanceof ClientIntentionPacket) {
-                boolean isBungeecord = ServerConfig.BUNGEECORD.getNotNull();
-                boolean isBungeeGuard = ServerConfig.BUNGEE_GUARD.getNotNull();
+                boolean isBungeeCord = ServerConfig.PROXY.BUNGEECORD.resolve();
+                boolean isBungeeGuard = ServerConfig.PROXY.BUNGEE_GUARD.resolve();
                 ClientIntentionPacket intentionPacket = (ClientIntentionPacket) packet;
                 switch (intentionPacket.getIntent()) {
                     case STATUS: {
@@ -110,7 +110,7 @@ public class LimboServerListener extends ServerListener {
                     case LOGIN:
                     case TRANSFER:
                         String bungeeForwarding = intentionPacket.getHostname();
-                        if (isBungeecord || isBungeeGuard) {
+                        if (isBungeeCord || isBungeeGuard) {
                             try {
                                 String[] data = bungeeForwarding.split("\\x00");
                                 String host = "";
@@ -120,7 +120,7 @@ public class LimboServerListener extends ServerListener {
                                 String skinData = "";
                                 int state = 0;
                                 for (int i = 0; i < data.length; i++) {
-                                    if (!ServerConfig.REDUCED_DEBUG_INFO.getNotNull()) {
+                                    if (!ServerConfig.LOGS.REDUCED_DEBUG_INFO.resolve()) {
                                         Limbo.getInstance().getConsole().sendMessage(i + ": " + data[i]);
                                     }
 
@@ -157,7 +157,7 @@ public class LimboServerListener extends ServerListener {
                                     throw new IllegalStateException("Illegal bungee state: " + state);
                                 }
 
-                                if (!ServerConfig.REDUCED_DEBUG_INFO.getNotNull()) {
+                                if (!ServerConfig.LOGS.REDUCED_DEBUG_INFO.resolve()) {
                                     Limbo.getInstance().getConsole().sendMessage("Host: " + host);
                                     Limbo.getInstance().getConsole().sendMessage("Floodgate: " + floodgate);
                                     Limbo.getInstance().getConsole().sendMessage("clientIp: " + clientIp);
@@ -179,7 +179,7 @@ public class LimboServerListener extends ServerListener {
                                         session.getFlag(NetworkConstants.FORWARD_FLAG).properties.add(new GameProfile.Property(property.get("name").toString(), property.get("value").toString(), signature != null ? signature.toString() : null));
                                         if (isBungeeGuard && property.get("name").toString().equals("bungeeguard-token")) {
                                             String token = property.get("value").toString();
-                                            bungeeGuardFound = ServerConfig.FORWARDING_SECRETS.getNotNull().contains(token);
+                                            bungeeGuardFound = ServerConfig.PROXY.FORWARDING_SECRETS.resolve().contains(token);
                                         }
                                     }
                                 }
@@ -189,7 +189,7 @@ public class LimboServerListener extends ServerListener {
                                     break;
                                 }
                             } catch (Exception e) {
-                                if (!ServerConfig.REDUCED_DEBUG_INFO.getNotNull()) {
+                                if (!ServerConfig.LOGS.REDUCED_DEBUG_INFO.resolve()) {
                                     StringWriter sw = new StringWriter();
                                     PrintWriter pw = new PrintWriter(sw);
                                     e.printStackTrace(pw);

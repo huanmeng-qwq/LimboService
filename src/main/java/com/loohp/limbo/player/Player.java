@@ -1,25 +1,29 @@
 /*
- * This file is part of Limbo.
- *
- * Copyright (C) 2022. LoohpJames <jamesloohp@gmail.com>
- * Copyright (C) 2022. Contributors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+  ~ This file is part of Limbo.
+  ~
+  ~ Copyright (C) 2024. YourCraftMC <admin@ycraft.cn>
+  ~ Copyright (C) 2022. LoohpJames <jamesloohp@gmail.com>
+  ~ Copyright (C) 2022. Contributors
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
  */
 
 package com.loohp.limbo.player;
 
 import cn.ycraft.limbo.config.ServerConfig;
+import cn.ycraft.limbo.config.ServerMessages;
+import cn.ycraft.limbo.network.ClientConnection;
+import cn.ycraft.limbo.util.SoundUtil;
 import com.loohp.limbo.Limbo;
 import com.loohp.limbo.commands.CommandSender;
 import com.loohp.limbo.entity.DataWatcher;
@@ -33,10 +37,6 @@ import com.loohp.limbo.events.player.PlayerChatEvent;
 import com.loohp.limbo.events.player.PlayerTeleportEvent;
 import com.loohp.limbo.inventory.*;
 import com.loohp.limbo.location.Location;
-import cn.ycraft.limbo.network.ClientConnection;
-import com.loohp.limbo.utils.BungeecordAdventureConversionUtils;
-import cn.ycraft.limbo.util.SoundUtil;
-import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.inventory.Book;
@@ -45,14 +45,10 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.Sound.Emitter;
 import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.ComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.Title.Times;
 import net.kyori.adventure.title.TitlePart;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import org.geysermc.mcprotocollib.network.packet.Packet;
 import org.geysermc.mcprotocollib.protocol.data.game.entity.player.GameMode;
 import org.geysermc.mcprotocollib.protocol.data.game.entity.player.Hand;
 import org.geysermc.mcprotocollib.protocol.data.game.entity.player.PlayerSpawnInfo;
@@ -64,7 +60,6 @@ import org.geysermc.mcprotocollib.protocol.data.game.level.notify.GameEvent;
 import org.geysermc.mcprotocollib.protocol.packet.common.clientbound.ClientboundResourcePackPushPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.ClientboundRespawnPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.ClientboundStopSoundPacket;
-import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.ClientboundSystemChatPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.ClientboundTabListPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.entity.player.ClientboundPlayerPositionPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.entity.player.ClientboundSetHeldSlotPacket;
@@ -74,12 +69,12 @@ import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.inventory.C
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.level.ClientboundGameEventPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.level.ClientboundSoundPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.title.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -247,24 +242,18 @@ public class Player extends LivingEntity implements CommandSender, InventoryHold
             location = event.getTo();
             super.teleport(location);
             if (!world.equals(location.getWorld())) {
-                ClientboundRespawnPacket respawn = new ClientboundRespawnPacket(
-                        new PlayerSpawnInfo(
-                                location.getWorld().getEnvironment().getId(),
-                                Key.key(location.getWorld().getName()),
-                                100,
-                                getGamemode(),
-                                getGamemode(),
-                                !ServerConfig.REDUCED_DEBUG_INFO.getNotNull(),
-                                false,
-                                null,
-                                100,
-                                5
-                        ),
-                        false, true
-                );
+                ClientboundRespawnPacket respawn = new ClientboundRespawnPacket(new PlayerSpawnInfo(
+                        location.getWorld().getEnvironment().getId(), Key.key(location.getWorld().getName()), 100,
+                        getGamemode(), getGamemode(),
+                        !ServerConfig.LOGS.REDUCED_DEBUG_INFO.resolve(),
+                        false, null, 100, 5
+                ), false, true);
                 clientConnection.sendPacket(respawn);
             }
-            ClientboundPlayerPositionPacket positionLook = new ClientboundPlayerPositionPacket(1, location.getX(), location.getY(), location.getZ(), 0, 0, 0, location.getYaw(), location.getPitch());
+            ClientboundPlayerPositionPacket positionLook = new ClientboundPlayerPositionPacket(
+                    1, location.getX(), location.getY(), location.getZ(),
+                    0, 0, 0, location.getYaw(), location.getPitch()
+            );
             clientConnection.sendPacket(positionLook);
         }
     }
@@ -286,30 +275,8 @@ public class Player extends LivingEntity implements CommandSender, InventoryHold
         sendMessage(Identity.identity(uuid), LegacyComponentSerializer.legacySection().deserialize(message));
     }
 
-    @Deprecated
-    public void sendMessage(BaseComponent component, UUID uuid) {
-        sendMessage(new BaseComponent[]{component}, uuid);
-    }
-
-    @Deprecated
-    @Override
-    public void sendMessage(BaseComponent[] component, UUID uuid) {
-        sendMessage(Identity.identity(uuid), BungeecordAdventureConversionUtils.toComponent(component));
-    }
-
     public void sendMessage(String message) {
         sendMessage(LegacyComponentSerializer.legacySection().deserialize(message));
-    }
-
-    @Deprecated
-    public void sendMessage(BaseComponent component) {
-        sendMessage(new BaseComponent[]{component});
-    }
-
-    @Deprecated
-    @Override
-    public void sendMessage(BaseComponent[] component) {
-        sendMessage(BungeecordAdventureConversionUtils.toComponent(component));
     }
 
     public void disconnect() {
@@ -324,16 +291,6 @@ public class Player extends LivingEntity implements CommandSender, InventoryHold
         clientConnection.disconnect(reason);
     }
 
-    @Deprecated
-    public void disconnect(BaseComponent reason) {
-        disconnect(new BaseComponent[]{reason});
-    }
-
-    @Deprecated
-    public void disconnect(BaseComponent[] reason) {
-        disconnect(BungeecordAdventureConversionUtils.toComponent(reason));
-    }
-
     public void chat(String message) {
         chat(message, false);
     }
@@ -343,83 +300,40 @@ public class Player extends LivingEntity implements CommandSender, InventoryHold
     }
 
     public void chat(String message, boolean verbose, byte[] saltSignature, Instant time) {
-        if (ServerConfig.ALLOW_CHAT.getNotNull()) {
-            PlayerChatEvent event = Limbo.getInstance().getEventsManager().callEvent(new PlayerChatEvent(this, CHAT_DEFAULT_FORMAT, message, false));
-            if (!event.isCancelled()) {
-                if (hasPermission("limboserver.chat")) {
-                    String chat = event.getFormat().replace("%name%", username).replace("%message%", event.getMessage());
-                    Limbo.getInstance().getConsole().sendMessage(chat);
-                    if (event.getFormat().equals(CHAT_DEFAULT_FORMAT)) {
-                        for (Player each : Limbo.getInstance().getPlayers()) {
-                            each.sendMessage(Identity.identity(uuid), Component.translatable("chat.type.text").args(Component.text(this.getName()), Component.text(event.getMessage())), MessageType.CHAT, saltSignature, time);
-                        }
-                    } else {
-                        for (Player each : Limbo.getInstance().getPlayers()) {
-                            each.sendMessage(Identity.identity(uuid), Component.text(chat), MessageType.SYSTEM, saltSignature, time);
-                        }
-                    }
-                } else if (verbose) {
-                    sendMessage(ChatColor.RED + "You do not have permission to chat!");
-                }
-            }
+        String format = ServerConfig.PLAYER.CHAT_FORMAT.get();
+        if (format == null || format.isEmpty()) return;
+
+        PlayerChatEvent event = Limbo.getInstance().getEventsManager().callEvent(new PlayerChatEvent(this, format, message, false));
+        if (event.isCancelled()) return;
+
+        if (!hasPermission("limboserver.chat")) {
+            ServerMessages.NO_CHAT_PERMISSION.sendTo(this);
+            return;
         }
+
+        String chat = event.getFormat().replace("%(name)", username).replace("%(message)", event.getMessage());
+        Limbo.getInstance().getConsole().sendMessage(chat);
+
+        for (Player each : Limbo.getInstance().getPlayers()) {
+            each.sendMessage(chat); // TODO Using SignedMessage.
+//            each.sendMessage(Identity.identity(uuid), Component.translatable("chat.type.text").args(Component.text(this.getName()), Component.text(event.getMessage())), MessageType.CHAT, saltSignature, time);
+        }
+
     }
 
-    public void setResourcePack(String url, String hash, boolean forced) {
-        setResourcePack(url, hash, forced, (BaseComponent[]) null);
-    }
 
-    @Deprecated
-    public void setResourcePack(String url, String hash, boolean forced, BaseComponent promptmessage) {
-        setResourcePack(url, hash, forced, promptmessage == null ? null : new BaseComponent[]{promptmessage});
-    }
-
-    @Deprecated
-    public void setResourcePack(String url, String hash, boolean forced, BaseComponent[] promptmessage) {
-        setResourcePack(url, hash, forced, promptmessage == null ? null : BungeecordAdventureConversionUtils.toComponent(promptmessage));
-    }
-
-    public void setResourcePack(String url, String hash, boolean forced, Component promptmessage) {
-        ClientboundResourcePackPushPacket packsend = new ClientboundResourcePackPushPacket(UUID.randomUUID(), url, hash, forced, promptmessage);
+    public void setResourcePack(String url, String hash, boolean forced, Component prompt) {
+        ClientboundResourcePackPushPacket packsend = new ClientboundResourcePackPushPacket(UUID.randomUUID(), url, hash, forced, prompt);
         clientConnection.sendPacket(packsend);
-    }
-
-    @Deprecated
-    public void setPlayerListHeaderFooter(BaseComponent[] header, BaseComponent[] footer) {
-        sendPlayerListHeaderAndFooter(header == null ? Component.empty() : BungeecordAdventureConversionUtils.toComponent(header), footer == null ? Component.empty() : BungeecordAdventureConversionUtils.toComponent(footer));
-    }
-
-    @Deprecated
-    public void setPlayerListHeaderFooter(BaseComponent header, BaseComponent footer) {
-        sendPlayerListHeaderAndFooter(header == null ? Component.empty() : BungeecordAdventureConversionUtils.toComponent(header), footer == null ? Component.empty() : BungeecordAdventureConversionUtils.toComponent(footer));
     }
 
     public void setPlayerListHeaderFooter(String header, String footer) {
         sendPlayerListHeaderAndFooter(header == null ? Component.empty() : LegacyComponentSerializer.legacySection().deserialize(header), footer == null ? Component.empty() : LegacyComponentSerializer.legacySection().deserialize(footer));
     }
 
-    @Deprecated
-    public void setTitle(BaseComponent[] title) {
-        sendTitlePart(TitlePart.TITLE, BungeecordAdventureConversionUtils.toComponent(title));
-    }
-
-    @Deprecated
-    public void setTitle(BaseComponent title) {
-        sendTitlePart(TitlePart.TITLE, BungeecordAdventureConversionUtils.toComponent(title));
-    }
 
     public void setTitle(String title) {
         sendTitlePart(TitlePart.TITLE, LegacyComponentSerializer.legacySection().deserialize(title));
-    }
-
-    @Deprecated
-    public void setSubTitle(BaseComponent[] subTitle) {
-        sendTitlePart(TitlePart.SUBTITLE, BungeecordAdventureConversionUtils.toComponent(subTitle));
-    }
-
-    @Deprecated
-    public void setSubTitle(BaseComponent subTitle) {
-        sendTitlePart(TitlePart.SUBTITLE, BungeecordAdventureConversionUtils.toComponent(subTitle));
     }
 
     public void setSubTitle(String subTitle) {
@@ -427,55 +341,18 @@ public class Player extends LivingEntity implements CommandSender, InventoryHold
     }
 
     public void setTitleTimer(int fadeIn, int stay, int fadeOut) {
-        sendTitlePart(TitlePart.TIMES, Title.Times.times(Duration.ofMillis(fadeIn * 50), Duration.ofMillis(stay * 50), Duration.ofMillis(fadeOut * 50)));
-    }
-
-    @Deprecated
-    public void setTitleSubTitle(BaseComponent[] title, BaseComponent[] subTitle, int fadeIn, int stay, int fadeOut) {
-        setTitleTimer(fadeIn, stay, fadeOut);
-        setTitle(title);
-        setSubTitle(subTitle);
-    }
-
-    @Deprecated
-    public void setTitleSubTitle(BaseComponent title, BaseComponent subTitle, int fadeIn, int stay, int fadeOut) {
-        setTitleSubTitle(new BaseComponent[]{title}, new BaseComponent[]{subTitle}, fadeIn, stay, fadeOut);
+        sendTitlePart(TitlePart.TIMES, Title.Times.times(Duration.ofMillis(fadeIn * 50L), Duration.ofMillis(stay * 50L), Duration.ofMillis(fadeOut * 50L)));
     }
 
     public void setTitleSubTitle(String title, String subTitle, int fadeIn, int stay, int fadeOut) {
-        sendTitlePart(TitlePart.TIMES, Title.Times.times(Duration.ofMillis(fadeIn * 50), Duration.ofMillis(stay * 50), Duration.ofMillis(fadeOut * 50)));
+        sendTitlePart(TitlePart.TIMES, Title.Times.times(Duration.ofMillis(fadeIn * 50L), Duration.ofMillis(stay * 50L), Duration.ofMillis(fadeOut * 50L)));
         sendTitlePart(TitlePart.SUBTITLE, LegacyComponentSerializer.legacySection().deserialize(subTitle));
         sendTitlePart(TitlePart.TITLE, LegacyComponentSerializer.legacySection().deserialize(title));
     }
 
     @Override
-    public void sendMessage(Identity source, Component message, MessageType type) {
-        sendMessage(source, message, type, null, Instant.now());
-    }
-
-    public void sendMessage(Identity source, Component message, MessageType type, byte[] signature, Instant time) {
-        Packet chat;
-        switch (type) {
-            case CHAT:
-                /*
-                if (signature == null) {
-                    chat = new ClientboundPlayerChatPacket(Component.empty(), Optional.of(message), 0, uuid, time, SignatureData.NONE);
-                } else {
-                    chat = new ClientboundPlayerChatPacket(message, Optional.of(message), 0, uuid, time, signature);
-                }
-                break;
-                */
-            case SYSTEM:
-            default:
-                chat = new ClientboundSystemChatPacket(message, false);
-                break;
-        }
-        clientConnection.sendPacket(chat);
-    }
-
-    @Override
     public void openBook(Book book) {
-       ItemStack item = getInventory().getItem(8);
+        ItemStack item = getInventory().getItem(8);
         byte selectedSlot = getSelectedSlot();
         ItemStack itemStack = new ItemStack(Key.key("written_book"));
         String title = LegacyComponentSerializer.legacySection().serialize(book.title());
@@ -496,39 +373,38 @@ public class Player extends LivingEntity implements CommandSender, InventoryHold
     }
 
     @Override
-    public void playSound(Sound sound, Emitter emitter) {
+    public void playSound(@NotNull Sound sound, @NotNull Emitter emitter) {
         throw new UnsupportedOperationException("This function has not been implemented yet.");
     }
 
     @Override
-    public void playSound(Sound sound, double x, double y, double z) {
+    public void playSound(@NotNull Sound sound, double x, double y, double z) {
         ClientboundSoundPacket namedSoundEffect = new ClientboundSoundPacket(
-                SoundUtil.from(sound.name()),
-                SoundUtil.from(sound.source()),
+                SoundUtil.from(sound.name()), SoundUtil.from(sound.source()),
                 x, y, z, sound.volume(), sound.pitch(), sound.seed().orElse(ThreadLocalRandom.current().nextLong())
         );
         clientConnection.sendPacket(namedSoundEffect);
     }
 
     @Override
-    public void playSound(Sound sound) {
+    public void playSound(@NotNull Sound sound) {
         playSound(sound, x, y, z);
     }
 
     @Override
-    public void sendActionBar(Component message) {
+    public void sendActionBar(@NotNull Component message) {
         ClientboundSetActionBarTextPacket setActionBar = new ClientboundSetActionBarTextPacket(message);
         clientConnection.sendPacket(setActionBar);
     }
 
     @Override
-    public void sendPlayerListHeaderAndFooter(Component header, Component footer) {
+    public void sendPlayerListHeaderAndFooter(@NotNull Component header, @NotNull Component footer) {
         ClientboundTabListPacket listHeaderFooter = new ClientboundTabListPacket(header, footer);
         clientConnection.sendPacket(listHeaderFooter);
     }
 
     @Override
-    public <T> void sendTitlePart(TitlePart<T> part, T value) {
+    public <T> void sendTitlePart(TitlePart<T> part, @NotNull T value) {
         if (part.equals(TitlePart.TITLE)) {
             ClientboundSetTitleTextPacket setTitle = new ClientboundSetTitleTextPacket((Component) value);
             clientConnection.sendPacket(setTitle);
@@ -555,11 +431,11 @@ public class Player extends LivingEntity implements CommandSender, InventoryHold
     }
 
     /**
-     * Use {@link com.loohp.limbo.bossbar.KeyedBossBar#showPlayer(Player)} instead
+     * @deprecated Use {@link com.loohp.limbo.bossbar.KeyedBossBar#showPlayer(Player)} instead
      */
     @Override
     @Deprecated
-    public void showBossBar(BossBar bar) {
+    public void showBossBar(@NotNull BossBar bar) {
         Limbo.getInstance().getBossBars().values().stream().filter(each -> each.getProperties() == bar).findFirst().ifPresent(each -> each.showPlayer(this));
     }
 
@@ -568,7 +444,7 @@ public class Player extends LivingEntity implements CommandSender, InventoryHold
      */
     @Override
     @Deprecated
-    public void hideBossBar(BossBar bar) {
+    public void hideBossBar(@NotNull BossBar bar) {
         Limbo.getInstance().getBossBars().values().stream().filter(each -> each.getProperties() == bar).findFirst().ifPresent(each -> each.hidePlayer(this));
     }
 

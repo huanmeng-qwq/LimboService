@@ -1,6 +1,8 @@
 package cn.ycraft.limbo.network;
 
+import cn.ycraft.limbo.config.AllowlistConfig;
 import cn.ycraft.limbo.config.ServerConfig;
+import cn.ycraft.limbo.config.ServerMessages;
 import cn.ycraft.limbo.network.server.ForwardData;
 import cn.ycraft.limbo.util.EntityUtil;
 import com.loohp.limbo.Limbo;
@@ -14,7 +16,6 @@ import com.loohp.limbo.utils.DeclareCommands;
 import com.loohp.limbo.world.World;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import jdk.internal.foreign.abi.aarch64.AArch64Architecture;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -64,12 +65,17 @@ public class PlayerLoginHandler implements ServerLoginHandler {
             profile.setProperties(forwardedData.velocityDataFrom.properties);
         }
 
-        if (!ServerConfig.ENFORCE_WHITELIST.getNotNull() && ServerConfig.whitelist.containsKey(profile.getId())) {
-            session.disconnect(Component.text("You are not whitelisted on the server"));
+        if (!AllowlistConfig.isAllowed(profile.getId(), profile.getName())) {
+            session.disconnect(ServerMessages.NOT_ALLOWED.compileLine(null));
             return;
         }
 
-        Player player = new Player(clientConnection, profile.getName(), profile.getId(), Limbo.getInstance().getNextEntityId(), ServerConfig.WORLD_SPAWN.get(), new PlayerInteractManager());
+        Player player = new Player(
+                clientConnection, profile.getName(), profile.getId(),
+                Limbo.getInstance().getNextEntityId(),
+                ServerConfig.WORLD.SPAWNPOINT.resolve(),
+                new PlayerInteractManager()
+        );
         player.setSkinLayers((byte) (0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20 | 0x40));
 
         PlayerLoginEvent event = Limbo.getInstance().getEventsManager().callEvent(new PlayerLoginEvent(clientConnection, false, Component.empty()));
@@ -81,14 +87,20 @@ public class PlayerLoginHandler implements ServerLoginHandler {
 
         Limbo.getInstance().getUnsafe().a(player);
 
-        Location worldSpawn = ServerConfig.WORLD_SPAWN.getNotNull();
+        Location worldSpawn = ServerConfig.WORLD.SPAWNPOINT.resolve();
 
         PlayerSpawnEvent spawnEvent = Limbo.getInstance().getEventsManager().callEvent(new PlayerSpawnEvent(player, worldSpawn));
         worldSpawn = spawnEvent.getSpawnLocation();
         World world = worldSpawn.getWorld();
-        session.send(new ClientboundLoginPacket(0, false, new Key[]{Key.key("minecraft:" + world.getName())}, ServerConfig.MAX_PLAYERS.getNotNull(), 8, 8, !ServerConfig.REDUCED_DEBUG_INFO.getNotNull(), true, false, new PlayerSpawnInfo(world.getEnvironment().getId(), Key.key("minecraft:" + world.getName()), 0, ServerConfig.DEFAULT_GAMEMODE.getNotNull(), ServerConfig.DEFAULT_GAMEMODE.getNotNull(), false, true, null, 0, 0), false));
-        Limbo.getInstance().getUnsafe().a(player, ServerConfig.DEFAULT_GAMEMODE.getNotNull());
-
+        session.send(new ClientboundLoginPacket(
+                0, false, new Key[]{Key.key("minecraft:" + world.getName())},
+                ServerConfig.SERVER.MAX_PLAYERS.resolve(), 8, 8,
+                !ServerConfig.LOGS.REDUCED_DEBUG_INFO.resolve(),
+                true, false, new PlayerSpawnInfo(world.getEnvironment().getId(),
+                Key.key("minecraft:" + world.getName()), 0, ServerConfig.PLAYER.DEFAULT_GAMEMODE.resolve(),
+                ServerConfig.PLAYER.DEFAULT_GAMEMODE.resolve(), false, true, null, 0, 0), false
+        ));
+        Limbo.getInstance().getUnsafe().a(player, ServerConfig.PLAYER.DEFAULT_GAMEMODE.resolve());
 
         ByteBuf buffer = Unpooled.buffer();
         MinecraftTypes.writeString(buffer, Limbo.LIMBO_BRAND);
@@ -96,15 +108,28 @@ public class PlayerLoginHandler implements ServerLoginHandler {
         buffer.readBytes(bytes);
         clientConnection.sendPluginMessage(ClientConnection.BRAND_ANNOUNCE_CHANNEL, bytes);
 
-        ClientboundPlayerInfoUpdatePacket infoUpdatePacket = new ClientboundPlayerInfoUpdatePacket(EnumSet.of(PlayerListEntryAction.ADD_PLAYER, PlayerListEntryAction.UPDATE_GAME_MODE, PlayerListEntryAction.UPDATE_LISTED, PlayerListEntryAction.UPDATE_LATENCY, PlayerListEntryAction.UPDATE_DISPLAY_NAME), new PlayerListEntry[]{new PlayerListEntry(profile.getId(), profile, true, 9, ServerConfig.DEFAULT_GAMEMODE.getNotNull(), Component.text(profile.getName()), true, 0, null, 0, null, null)});
+        ClientboundPlayerInfoUpdatePacket infoUpdatePacket = new ClientboundPlayerInfoUpdatePacket(EnumSet.of(
+                PlayerListEntryAction.ADD_PLAYER, PlayerListEntryAction.UPDATE_GAME_MODE,
+                PlayerListEntryAction.UPDATE_LISTED, PlayerListEntryAction.UPDATE_LATENCY,
+                PlayerListEntryAction.UPDATE_DISPLAY_NAME
+        ), new PlayerListEntry[]{new PlayerListEntry(
+                profile.getId(), profile, true, 9, ServerConfig.PLAYER.DEFAULT_GAMEMODE.resolve(),
+                Component.text(profile.getName()), true, 0, null, 0, null, null)
+        });
         clientConnection.sendPacket(infoUpdatePacket);
 
-        ClientboundPlayerAbilitiesPacket abilitiesPacket = new ClientboundPlayerAbilitiesPacket(true, ServerConfig.ALLOW_FLIGHT.getNotNull(), false, ServerConfig.DEFAULT_GAMEMODE.getNotNull() == GameMode.CREATIVE, 0.05F, 0.1F);
+        ClientboundPlayerAbilitiesPacket abilitiesPacket = new ClientboundPlayerAbilitiesPacket(
+                true, ServerConfig.PLAYER.ALLOW_FLIGHT.resolve(), false,
+                ServerConfig.PLAYER.DEFAULT_GAMEMODE.resolve() == GameMode.CREATIVE,
+                0.05F, 0.1F
+        );
         clientConnection.sendPacket(abilitiesPacket);
 
-        InetSocketAddress inetAddress = (InetSocketAddress) clientConnection.getInetAddress();
-        String str = (ServerConfig.LOG_PLAYER_IP_ADDRESSES.getNotNull() ? inetAddress.getHostName() : "<ip address withheld>") + ":" + inetAddress.getPort() + "|" + player.getName() + "(" + player.getUniqueId() + ")";
-        Limbo.getInstance().getConsole().sendMessage("[/" + str + "] <-> Player had connected to the Limbo server!");
+        if (ServerConfig.LOGS.CONNECTION_VERBOSE.resolve()) {
+            InetSocketAddress inetAddress = (InetSocketAddress) clientConnection.getInetAddress();
+            String str = (ServerConfig.LOGS.DISPLAY_IP_ADDRESS.resolve() ? inetAddress.getHostName() : "<ip address withheld>") + ":" + inetAddress.getPort() + "|" + player.getName() + "(" + player.getUniqueId() + ")";
+            Limbo.getInstance().getConsole().sendMessage("[/" + str + "] <-> Player had connected to the Limbo server!");
+        }
 
         ClientboundGameEventPacket chunkStartEvent = new ClientboundGameEventPacket(GameEvent.LEVEL_CHUNKS_LOAD_START, null);
         clientConnection.sendPacket(chunkStartEvent);
@@ -142,11 +167,15 @@ public class PlayerLoginHandler implements ServerLoginHandler {
 //            player.clientConnection.sendPacket(state);
 //        }
 
-        // RESOURCEPACK CODE CONRIBUTED BY GAMERDUCK123
-        if (!ServerConfig.RESOURCE_PACK.getNotNull().equalsIgnoreCase("")) {
-            if (!ServerConfig.RESOURCE_PACK_SHA1.getNotNull().equalsIgnoreCase("")) {
+        // RESOURCEPACK CODE CONTRIBUTED BY GAMERDUCK123
+        if (!ServerConfig.RESOURCE_PACK.URL.resolve().isEmpty()) {
+            if (!ServerConfig.RESOURCE_PACK.SHA1.resolve().equalsIgnoreCase("")) {
                 //SEND RESOURCEPACK
-                player.setResourcePack(ServerConfig.RESOURCE_PACK.getNotNull(), ServerConfig.RESOURCE_PACK_SHA1.getNotNull(), ServerConfig.REQUIRED_RESOURCE_PACK.getNotNull(), GsonComponentSerializer.gson().deserialize(ServerConfig.RESOURCE_PACK_PROMPT.getNotNull()));
+                player.setResourcePack(
+                        ServerConfig.RESOURCE_PACK.URL.resolve(), ServerConfig.RESOURCE_PACK.SHA1.resolve(),
+                        ServerConfig.RESOURCE_PACK.FORCE.resolve(),
+                        GsonComponentSerializer.gson().deserialize(ServerConfig.RESOURCE_PACK.PROMPT.resolve())
+                );
             } else {
                 //NO SHA
                 Limbo.getInstance().getConsole().sendMessage("ResourcePacks require SHA1s");
@@ -155,9 +184,9 @@ public class PlayerLoginHandler implements ServerLoginHandler {
             //RESOURCEPACK NOT ENABLED
         }
 
-        // PLAYER LIST HEADER AND FOOTER CODE CONRIBUTED BY GAMERDUCK123
-        String headerStr = ServerConfig.TAB_HEADER.getNotNull();
-        String footerStr = ServerConfig.TAB_FOOTER.getNotNull();
+        // PLAYER LIST HEADER AND FOOTER CODE CONTRIBUTED BY GAMERDUCK123
+        String headerStr = ServerConfig.SERVER.TAB_LIST.HEADER.resolve();
+        String footerStr = ServerConfig.SERVER.TAB_LIST.FOOTER.resolve();
         Component header = Component.empty();
         Component footer = Component.empty();
         if (!headerStr.isEmpty()) {

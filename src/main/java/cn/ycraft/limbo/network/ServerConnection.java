@@ -1,20 +1,21 @@
 /*
- * This file is part of Limbo.
- *
- * Copyright (C) 2022. LoohpJames <jamesloohp@gmail.com>
- * Copyright (C) 2022. Contributors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+  ~ This file is part of Limbo.
+  ~
+  ~ Copyright (C) 2024. YourCraftMC <admin@ycraft.cn>
+  ~ Copyright (C) 2022. LoohpJames <jamesloohp@gmail.com>
+  ~ Copyright (C) 2022. Contributors
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
  */
 
 package cn.ycraft.limbo.network;
@@ -38,7 +39,6 @@ import org.geysermc.mcprotocollib.protocol.MinecraftConstants;
 import org.geysermc.mcprotocollib.protocol.data.status.PlayerInfo;
 import org.geysermc.mcprotocollib.protocol.data.status.ServerStatusInfo;
 import org.geysermc.mcprotocollib.protocol.data.status.VersionInfo;
-import org.geysermc.mcprotocollib.protocol.data.status.handler.ServerInfoBuilder;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -99,9 +99,9 @@ public class ServerConnection {
                 clients.put(event.getSession(), sc);
                 Limbo.getInstance().getEventsManager().callEvent(new ConnectionEstablishedEvent(sc));
 
-                if (ServerConfig.HANDSHAKE_VERBOSE.getNotNull()) {
+                if (ServerConfig.LOGS.HANDSHAKE_VERBOSE.resolve()) {
                     InetSocketAddress inetAddress = ((InetSocketAddress) event.getSession().getRemoteAddress());
-                    String str = (ServerConfig.LOG_PLAYER_IP_ADDRESSES.getNotNull() ? inetAddress.getHostName() : "<ip address withheld>") + ":" + inetAddress.getPort();
+                    String str = (ServerConfig.LOGS.DISPLAY_IP_ADDRESS.resolve() ? inetAddress.getHostName() : "<ip address withheld>") + ":" + inetAddress.getPort();
                     Limbo.getInstance().getConsole().sendMessage("[/" + str + "] <-> Legacy Status has pinged");
                 }
             }
@@ -118,8 +118,10 @@ public class ServerConnection {
 
                 Limbo.getInstance().getEventsManager().callEvent(new PlayerQuitEvent(player));
 
-                String str = (ServerConfig.LOG_PLAYER_IP_ADDRESSES.getNotNull() ? inetAddress.getHostName() : "<ip address withheld>") + ":" + inetAddress.getPort() + "|" + player.getName();
-                Limbo.getInstance().getConsole().sendMessage("[/" + str + "] <-> Player had disconnected!");
+                if (ServerConfig.LOGS.CONNECTION_VERBOSE.resolve()) {
+                    String str = (ServerConfig.LOGS.DISPLAY_IP_ADDRESS.resolve() ? inetAddress.getHostName() : "<ip address withheld>") + ":" + inetAddress.getPort() + "|" + player.getName();
+                    Limbo.getInstance().getConsole().sendMessage("[/" + str + "] <-> Player had disconnected!");
+                }
                 Limbo.getInstance().getUnsafe().b(player);
                 Limbo.getInstance().getServerConnection().getClients().remove(session);
             }
@@ -127,26 +129,23 @@ public class ServerConnection {
     }
 
     private void motd() {
-        server.setGlobalFlag(MinecraftConstants.SERVER_INFO_BUILDER_KEY, new ServerInfoBuilder() {
-            @Override
-            public ServerStatusInfo buildInfo(Session session) {
-                StatusPingEvent event = Limbo.getInstance().getEventsManager().callEvent(
-                        new StatusPingEvent(
-                                getClient(session),
-                                ServerConfig.VERSION.getNotNull(),
-                                Limbo.getInstance().SERVER_IMPLEMENTATION_PROTOCOL,
-                                GsonComponentSerializer.gson().deserialize(ServerConfig.MOTD.getNotNull()),
-                                ServerConfig.MAX_PLAYERS.getNotNull(),
-                                Limbo.getInstance().getPlayers().size(),
-                                ServerConfig.FAVICON
-                        )
-                );
-                return new ServerStatusInfo(event.getMotd(),
-                        new PlayerInfo(event.getMaxPlayers(), event.getPlayersOnline(), new ArrayList<>()),
-                        new VersionInfo(event.getVersion(), event.getProtocol()),
-                        event.getFavicon(), false
-                );
-            }
+        server.setGlobalFlag(MinecraftConstants.SERVER_INFO_BUILDER_KEY, session -> {
+            StatusPingEvent event = Limbo.getInstance().getEventsManager().callEvent(
+                    new StatusPingEvent(
+                            getClient(session),
+                            ServerConfig.SERVER.VERSION.resolve(),
+                            Limbo.getInstance().SERVER_IMPLEMENTATION_PROTOCOL,
+                            GsonComponentSerializer.gson().deserialize(ServerConfig.SERVER.MOTD.resolve()),
+                            ServerConfig.SERVER.MAX_PLAYERS.resolve(),
+                            Limbo.getInstance().getPlayers().size(),
+                            ServerConfig.SERVER.FAVICON.resolve().data()
+                    )
+            );
+            return new ServerStatusInfo(event.getMotd(),
+                    new PlayerInfo(event.getMaxPlayers(), event.getPlayersOnline(), new ArrayList<>()),
+                    new VersionInfo(event.getVersion(), event.getProtocol()),
+                    event.getFavicon(), false
+            );
         });
     }
 

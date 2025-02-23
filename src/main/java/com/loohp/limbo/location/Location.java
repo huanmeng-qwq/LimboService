@@ -1,20 +1,21 @@
 /*
- * This file is part of Limbo.
- *
- * Copyright (C) 2022. LoohpJames <jamesloohp@gmail.com>
- * Copyright (C) 2022. Contributors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+  ~ This file is part of Limbo.
+  ~
+  ~ Copyright (C) 2024. YourCraftMC <admin@ycraft.cn>
+  ~ Copyright (C) 2022. LoohpJames <jamesloohp@gmail.com>
+  ~ Copyright (C) 2022. Contributors
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
  */
 
 package com.loohp.limbo.location;
@@ -25,102 +26,102 @@ import com.loohp.limbo.world.BlockState;
 import com.loohp.limbo.world.World;
 
 public class Location implements Cloneable {
-	
-	private World world;
-	private double x;
-	private double y;
-	private double z;
-	private float yaw;
-	private float pitch;
-	
-	public Location(World world, double x, double y, double z, float yaw, float pitch) {
-		this.world = world;
-		this.x = x;
-		this.y = y;
-		this.z = z;
-		this.yaw = yaw;
-		this.pitch = pitch;
-	}
-	
-	public Location(World world, double x, double y, double z) {
-		this(world, x, y, z, 0, 0);
-	}
-	
-	@Override
-	public Location clone() {
-		try {
+
+    private World world;
+    private double x;
+    private double y;
+    private double z;
+    private float yaw;
+    private float pitch;
+
+    public Location(World world, double x, double y, double z, float yaw, float pitch) {
+        this.world = world;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.yaw = yaw;
+        this.pitch = pitch;
+    }
+
+    public Location(World world, double x, double y, double z) {
+        this(world, x, y, z, 0, 0);
+    }
+
+    @Override
+    public Location clone() {
+        try {
             return (Location) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new Error(e);
         }
-	}
-	
-	public BlockState getBlockState() {
-		return world.getBlock((int) x,(int) y,(int) z);
-	}
-	
-	public void setBlockState(BlockState state) {
-		world.setBlock((int) x, (int) y, (int) z, state);
-	}
-	
-	public boolean isWorldLoaded() {
-		return Limbo.getInstance().getWorld(world.getName()) != null;
-	}
+    }
 
-	public World getWorld() {
-		return world;
-	}
+    public BlockState getBlockState() {
+        return world.getBlock((int) x, (int) y, (int) z);
+    }
 
-	public void setWorld(World world) {
-		this.world = world;
-	}
+    public void setBlockState(BlockState state) {
+        world.setBlock((int) x, (int) y, (int) z, state);
+    }
 
-	public double getX() {
-		return x;
-	}
+    public boolean isWorldLoaded() {
+        return Limbo.getInstance().getWorld(world.getName()) != null;
+    }
 
-	public void setX(double x) {
-		this.x = x;
-	}
+    public World getWorld() {
+        return world;
+    }
 
-	public double getY() {
-		return y;
-	}
+    public void setWorld(World world) {
+        this.world = world;
+    }
 
-	public void setY(double y) {
-		this.y = y;
-	}
+    public double getX() {
+        return x;
+    }
 
-	public double getZ() {
-		return z;
-	}
+    public void setX(double x) {
+        this.x = x;
+    }
 
-	public void setZ(double z) {
-		this.z = z;
-	}
+    public double getY() {
+        return y;
+    }
 
-	public float getYaw() {
-		return yaw;
-	}
+    public void setY(double y) {
+        this.y = y;
+    }
 
-	public void setYaw(float yaw) {
-		this.yaw = yaw;
-	}
+    public double getZ() {
+        return z;
+    }
 
-	public float getPitch() {
-		return pitch;
-	}
+    public void setZ(double z) {
+        this.z = z;
+    }
 
-	public void setPitch(float pitch) {
-		this.pitch = pitch;
-	}
-	
-	/**
+    public float getYaw() {
+        return yaw;
+    }
+
+    public void setYaw(float yaw) {
+        this.yaw = yaw;
+    }
+
+    public float getPitch() {
+        return pitch;
+    }
+
+    public void setPitch(float pitch) {
+        this.pitch = pitch;
+    }
+
+    /**
      * Gets a unit-vector pointing in the direction that this Location is
      * facing.
      *
      * @return a vector pointing the direction of this location's {@link
-     *     #getPitch() pitch} and {@link #getYaw() yaw}
+     * #getPitch() pitch} and {@link #getYaw() yaw}
      */
     public Vector getDirection() {
         Vector vector = new Vector();
@@ -177,10 +178,10 @@ public class Location implements Cloneable {
     /**
      * Adds the location by another.
      *
-     * @see Vector
      * @param vec The other location
      * @return the same location
      * @throws IllegalArgumentException for differing worlds
+     * @see Vector
      */
     public Location add(Location vec) {
         if (vec == null || vec.getWorld() != getWorld()) {
@@ -196,9 +197,9 @@ public class Location implements Cloneable {
     /**
      * Adds the location by a vector.
      *
-     * @see Vector
      * @param vec Vector to use
      * @return the same location
+     * @see Vector
      */
     public Location add(Vector vec) {
         this.x += vec.getX();
@@ -210,11 +211,11 @@ public class Location implements Cloneable {
     /**
      * Adds the location by another. Not world-aware.
      *
-     * @see Vector
      * @param x X coordinate
      * @param y Y coordinate
      * @param z Z coordinate
      * @return the same location
+     * @see Vector
      */
     public Location add(double x, double y, double z) {
         this.x += x;
@@ -226,10 +227,10 @@ public class Location implements Cloneable {
     /**
      * Subtracts the location by another.
      *
-     * @see Vector
      * @param vec The other location
      * @return the same location
      * @throws IllegalArgumentException for differing worlds
+     * @see Vector
      */
     public Location subtract(Location vec) {
         if (vec == null || vec.getWorld() != getWorld()) {
@@ -245,9 +246,9 @@ public class Location implements Cloneable {
     /**
      * Subtracts the location by a vector.
      *
-     * @see Vector
      * @param vec The vector to use
      * @return the same location
+     * @see Vector
      */
     public Location subtract(Vector vec) {
         this.x -= vec.getX();
@@ -260,11 +261,11 @@ public class Location implements Cloneable {
      * Subtracts the location by another. Not world-aware and
      * orientation independent.
      *
-     * @see Vector
      * @param x X coordinate
      * @param y Y coordinate
      * @param z Z coordinate
      * @return the same location
+     * @see Vector
      */
     public Location subtract(double x, double y, double z) {
         this.x -= x;
@@ -367,7 +368,7 @@ public class Location implements Cloneable {
      * Constructs a new {@link Vector} based on this Location
      *
      * @return New Vector containing the coordinates represented by this
-     *     Location
+     * Location
      */
     public Vector toVector() {
         return new Vector(x, y, z);
@@ -431,13 +432,18 @@ public class Location implements Cloneable {
         }
         return pitch;
     }
-	
-	@Override
-	public String toString() {
-		return "Location{" + "world=" + world + ",x=" + x + ",y=" + y + ",z=" + z + ",pitch=" + pitch + ",yaw=" + yaw + "}"; 
-	}
 
-	@Override
+
+    public String toSimpleString() {
+        return world.getName() + "," + x + "," + y + "," + z + "," + pitch + "," + yaw;
+    }
+
+    @Override
+    public String toString() {
+        return "Location{" + "world=" + world + ",x=" + x + ",y=" + y + ",z=" + z + ",pitch=" + pitch + ",yaw=" + yaw + "}";
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;

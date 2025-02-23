@@ -1,20 +1,21 @@
 /*
- * This file is part of Limbo.
- *
- * Copyright (C) 2022. LoohpJames <jamesloohp@gmail.com>
- * Copyright (C) 2022. Contributors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+  ~ This file is part of Limbo.
+  ~
+  ~ Copyright (C) 2024. YourCraftMC <admin@ycraft.cn>
+  ~ Copyright (C) 2022. LoohpJames <jamesloohp@gmail.com>
+  ~ Copyright (C) 2022. Contributors
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
  */
 
 package com.loohp.limbo.metrics;
@@ -30,20 +31,13 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.zip.GZIPOutputStream;
 
 /**
  * bStats collects some data for plugin authors.
- *
+ * <p>
  * Check out https://bStats.org/ to learn more about bStats!
  */
 @SuppressWarnings("unchecked")
@@ -63,26 +57,17 @@ public class Metrics {
 
     // The uuid of the server
     private final String serverUUID;
-    
+
     private final String limboVersion;
 
     // A list with all custom charts
     private final List<CustomChart> charts = new ArrayList<>();
 
-    /**
-     * Class constructor.
-     *
-     * @param name The name of the server software.
-     * @param serverUUID The uuid of the server.
-     * @param logFailedRequests Whether failed requests should be logged or not.
-     * @param logger The logger for the failed requests.
-     * @throws IOException 
-     */
     public Metrics() throws IOException {
-    	name = "Limbo";
-    	
-    	// Get the config file
-   	 	File configFile = new File("plugins/bStats", "config.yml");		
+        name = "Limbo";
+
+        // Get the config file
+        File configFile = new File("plugins/bStats", "config.yml");
         FileConfiguration config = new FileConfiguration(configFile);
 
         // Check if the config file exists
@@ -98,17 +83,17 @@ public class Metrics {
             // Inform the server owners about bStats
             config.setHeader(
                     "bStats collects some data for plugin authors like how many servers are using their plugins.\n" +
-                    "To honor their work, you should not disable it.\n" +
-                    "This has nearly no effect on the server performance!\n" +
-                    "Check out https://bStats.org/ to learn more :)"
+                            "To honor their work, you should not disable it.\n" +
+                            "This has nearly no effect on the server performance!\n" +
+                            "Check out https://bStats.org/ to learn more :)"
             );
             try {
                 config.saveConfig(configFile);
             } catch (IOException e) {
-            	e.printStackTrace();
+                e.printStackTrace();
             }
         }
-        
+
         limboVersion = Limbo.getInstance().LIMBO_IMPLEMENTATION_VERSION;
 
         // Load the data
@@ -116,28 +101,28 @@ public class Metrics {
         logFailedRequests = config.get("logFailedRequests", Boolean.class);
         if (config.get("enabled", Boolean.class)) {
             startSubmitting();
-        }       
-        
-        addCustomChart(new Metrics.SingleLineChart("players", new Callable<Integer>() {
-	        @Override
-	        public Integer call() throws Exception {
-	            return Limbo.getInstance().getPlayers().size();
-	        }
-	    }));
-		
-		addCustomChart(new Metrics.SimplePie("limbo_version", new Callable<String>() {
-	        @Override
-	        public String call() throws Exception {
-	            return limboVersion;
-	        }
-	    }));
+        }
 
-		addCustomChart(new Metrics.SimplePie("minecraftVersion", new Callable<String>() {
-	        @Override
-	        public String call() throws Exception {
-	            return Limbo.getInstance().SERVER_IMPLEMENTATION_VERSION;
-	        }
-	    }));
+        addCustomChart(new Metrics.SingleLineChart("players", new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+                return Limbo.getInstance().getPlayers().size();
+            }
+        }));
+
+        addCustomChart(new Metrics.SimplePie("limbo_version", new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                return limboVersion;
+            }
+        }));
+
+        addCustomChart(new Metrics.SimplePie("minecraftVersion", new Callable<String>() {
+            @Override
+            public String call() throws Exception {
+                return Limbo.getInstance().SERVER_IMPLEMENTATION_VERSION;
+            }
+        }));
     }
 
     /**
@@ -162,7 +147,7 @@ public class Metrics {
             public void run() {
                 submitData();
             }
-        }, 1000*60*5, 1000*60*30);
+        }, 1000 * 60 * 5, 1000 * 60 * 30);
         // Submit the data every 30 minutes, first time after 5 minutes to give other plugins enough time to start
         // WARNING: Changing the frequency has no effect but your plugin WILL be blocked/deleted!
         // WARNING: Just don't do it!
@@ -173,7 +158,7 @@ public class Metrics {
      *
      * @return The plugin specific data.
      */
-	private JSONObject getPluginData() {
+    private JSONObject getPluginData() {
         JSONObject data = new JSONObject();
 
         data.put("pluginName", name); // Append the name of the server software
@@ -321,7 +306,7 @@ public class Metrics {
                 chart.put("data", data);
             } catch (Throwable t) {
                 if (logFailedRequests) {
-                	Limbo.getInstance().getConsole().sendMessage("Failed to get data for custom chart with id " + chartId + "\n" + t);
+                    Limbo.getInstance().getConsole().sendMessage("Failed to get data for custom chart with id " + chartId + "\n" + t);
                 }
                 return null;
             }
@@ -342,7 +327,7 @@ public class Metrics {
         /**
          * Class constructor.
          *
-         * @param chartId The id of the chart.
+         * @param chartId  The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
         public SimplePie(String chartId, Callable<String> callable) {
@@ -373,7 +358,7 @@ public class Metrics {
         /**
          * Class constructor.
          *
-         * @param chartId The id of the chart.
+         * @param chartId  The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
         public AdvancedPie(String chartId, Callable<Map<String, Integer>> callable) {
@@ -417,7 +402,7 @@ public class Metrics {
         /**
          * Class constructor.
          *
-         * @param chartId The id of the chart.
+         * @param chartId  The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
         public DrilldownPie(String chartId, Callable<Map<String, Map<String, Integer>>> callable) {
@@ -466,7 +451,7 @@ public class Metrics {
         /**
          * Class constructor.
          *
-         * @param chartId The id of the chart.
+         * @param chartId  The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
         public SingleLineChart(String chartId, Callable<Integer> callable) {
@@ -498,7 +483,7 @@ public class Metrics {
         /**
          * Class constructor.
          *
-         * @param chartId The id of the chart.
+         * @param chartId  The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
         public MultiLineChart(String chartId, Callable<Map<String, Integer>> callable) {
@@ -543,7 +528,7 @@ public class Metrics {
         /**
          * Class constructor.
          *
-         * @param chartId The id of the chart.
+         * @param chartId  The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
         public SimpleBarChart(String chartId, Callable<Map<String, Integer>> callable) {
@@ -581,7 +566,7 @@ public class Metrics {
         /**
          * Class constructor.
          *
-         * @param chartId The id of the chart.
+         * @param chartId  The id of the chart.
          * @param callable The callable which is used to request the chart data.
          */
         public AdvancedBarChart(String chartId, Callable<Map<String, int[]>> callable) {
@@ -619,7 +604,7 @@ public class Metrics {
         }
 
     }
-    
+
     /**
      * Represents a custom simple map chart.
      */
@@ -1013,7 +998,7 @@ public class Metrics {
          *
          * @param locale The locale.
          * @return The country from the giben locale or <code>null</code> if unknown country or
-         *         if the locale does not contain a country.
+         * if the locale does not contain a country.
          */
         public static Country byLocale(Locale locale) {
             return byIsoTag(locale.getCountry());

@@ -1,20 +1,21 @@
 /*
- * This file is part of Limbo.
- *
- * Copyright (C) 2022. LoohpJames <jamesloohp@gmail.com>
- * Copyright (C) 2022. Contributors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+  ~ This file is part of Limbo.
+  ~
+  ~ Copyright (C) 2024. YourCraftMC <admin@ycraft.cn>
+  ~ Copyright (C) 2022. LoohpJames <jamesloohp@gmail.com>
+  ~ Copyright (C) 2022. Contributors
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
  */
 
 package cn.ycraft.limbo.network;
@@ -22,11 +23,9 @@ package cn.ycraft.limbo.network;
 import cn.ycraft.limbo.config.ServerConfig;
 import com.loohp.limbo.Limbo;
 import com.loohp.limbo.player.Player;
-import com.loohp.limbo.utils.BungeecordAdventureConversionUtils;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import net.md_5.bungee.api.chat.BaseComponent;
 import org.geysermc.mcprotocollib.network.Session;
 import org.geysermc.mcprotocollib.network.event.session.SessionAdapter;
 import org.geysermc.mcprotocollib.network.packet.Packet;
@@ -81,10 +80,6 @@ public class ClientConnection extends SessionAdapter {
         setLastPacketTimestamp(System.currentTimeMillis());
     }
 
-    public void disconnect(BaseComponent[] reason) {
-        disconnect(BungeecordAdventureConversionUtils.toComponent(reason));
-    }
-
     public void disconnect(Component reason) {
         session.disconnect(reason);
     }
@@ -93,8 +88,8 @@ public class ClientConnection extends SessionAdapter {
     public void packetSent(Session session, Packet packet) {
         if (packet instanceof ClientboundLoginDisconnectPacket) {
             ClientboundLoginDisconnectPacket disconnectPacket = (ClientboundLoginDisconnectPacket) packet;
-            if (!ServerConfig.REDUCED_DEBUG_INFO.getNotNull()) {
-                String str = (ServerConfig.LOG_PLAYER_IP_ADDRESSES.getNotNull() ? ((InetSocketAddress) inetAddress).getHostName() : "<ip address withheld>") + ":" + ((InetSocketAddress) session.getLocalAddress()).getPort();
+            if (!ServerConfig.LOGS.REDUCED_DEBUG_INFO.resolve()) {
+                String str = (ServerConfig.LOGS.DISPLAY_IP_ADDRESS.resolve() ? ((InetSocketAddress) inetAddress).getHostName() : "<ip address withheld>") + ":" + ((InetSocketAddress) session.getLocalAddress()).getPort();
                 Limbo.getInstance().getConsole().sendMessage("[/" + str + "] <-> Player disconnected with the reason " + PlainTextComponentSerializer.plainText().serialize(disconnectPacket.getReason()));
             }
         }

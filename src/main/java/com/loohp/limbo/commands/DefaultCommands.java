@@ -1,20 +1,21 @@
 /*
- * This file is part of Limbo.
- *
- * Copyright (C) 2022. LoohpJames <jamesloohp@gmail.com>
- * Copyright (C) 2022. Contributors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+  ~ This file is part of Limbo.
+  ~
+  ~ Copyright (C) 2024. YourCraftMC <admin@ycraft.cn>
+  ~ Copyright (C) 2022. LoohpJames <jamesloohp@gmail.com>
+  ~ Copyright (C) 2022. Contributors
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
  */
 
 package com.loohp.limbo.commands;
@@ -58,12 +59,12 @@ public class DefaultCommands implements CommandExecutor, TabCompletor {
             if (sender.hasPermission("limboserver.spawn")) {
                 if (args.length == 1 && sender instanceof Player) {
                     Player player = (Player) sender;
-                    player.teleport(ServerConfig.WORLD_SPAWN.getNotNull());
+                    player.teleport(ServerConfig.WORLD_SPAWN.resolve());
                     player.sendMessage(ChatColor.GOLD + "Teleporting you to spawn!");
                 } else if (args.length == 2) {
                     Player player = Limbo.getInstance().getPlayer(args[1]);
                     if (player != null) {
-                        player.teleport(ServerConfig.WORLD_SPAWN.getNotNull());
+                        player.teleport(ServerConfig.WORLD_SPAWN.resolve());
                         sender.sendMessage(ChatColor.GOLD + "Teleporting " + player.getName() + " to spawn!");
                     } else {
                         sender.sendMessage(ChatColor.RED + "Player not found!");
