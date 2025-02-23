@@ -21,7 +21,7 @@ or other versions from [Releases](https://github.com/YourCraftMC/LimboService/re
     - Also you can put the world scheme file to the same directory as limbo's world.
 2. Use the following command lines to start the limbo server just like any other Minecraft server jars
    ```shell
-   java -Xms64M -Xmx512M -jar Limbo.jar
+   java -Xms64M -Xmx512M -jar LimboService-<VERSION>-<MINECRAFT>.jar
    ```
 3. Configure settings in `config.yml` and messages in `messages.yml`.
     - Also see `allowlist.yml` for allowing/disallowing players to join.

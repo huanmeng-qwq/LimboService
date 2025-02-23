@@ -126,13 +126,13 @@
 
     <dependencies>
 
-
+        <!--suppress VulnerableLibrariesLocal -->
         <dependency>
             <groupId>org.geysermc.mcprotocollib</groupId>
             <artifactId>protocol</artifactId>
             <version>1.21.4-SNAPSHOT</version>
         </dependency>
-        
+
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
@@ -166,6 +166,7 @@
             <scope>compile</scope>
         </dependency>
 
+        <!--suppress VulnerableLibrariesLocal -->
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
@@ -236,6 +237,7 @@
             <scope>compile</scope>
         </dependency>
 
+        <!--suppress VulnerableLibrariesLocal -->
         <dependency>
             <groupId>org.jline</groupId>
             <artifactId>jline</artifactId>
@@ -386,5 +388,38 @@
         </plugins>
         <finalName>${project.artifactId}-${project.version}-${minecraft.version}</finalName>
     </build>
+
+    <profiles>
+
+        <profile>
+            <id>central</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.7.0</version>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <autoPublish>true</autoPublish>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>github</id>
+            <distributionManagement>
+                <repository>
+                    <id>github</id>
+                    <name>GitHub Packages</name>
+                    <url>https://maven.pkg.github.com/YourCraftMC/LimboService</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+
+    </profiles>
 
 </project>
