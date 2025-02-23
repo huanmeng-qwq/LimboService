@@ -26,7 +26,7 @@ or other versions from [Releases](https://github.com/YourCraftMC/LimboService/re
 
 ## Development
 
-You can find packages from GitHub Packages.
+You can find packages from [GitHub Packages](https://github.com/orgs/YourCraftMC/packages?repo_name=LimboService).
 
 Remember to replace `VERSION` with the version you're using.
 
