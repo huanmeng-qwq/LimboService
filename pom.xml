@@ -36,7 +36,7 @@
 
     <groupId>cn.ycraft</groupId>
     <artifactId>limboservice</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <name>LimboService</name>
     <description>A lightweight &amp; standalone LIMBO service for Minecraft.</description>
@@ -329,6 +329,17 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <useReleaseProfile>false</useReleaseProfile>
+                    <releaseProfiles>release</releaseProfiles>
+                    <goals>deploy</goals>
+                </configuration>
+            </plugin>
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
                     <execution>
@@ -357,7 +368,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.11.2</version>
                 <configuration>
                     <failOnError>false</failOnError>
                     <encoding>ISO-8859-1</encoding>
@@ -369,7 +380,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>install</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>aggregate</goal>
                         </goals>
@@ -407,6 +418,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <finalName>${project.name}-${project.version}-mc${minecraft.version}</finalName>
                     <outputDirectory>${project.basedir}/.asset/</outputDirectory>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
                     <filters>
@@ -421,7 +433,6 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>${project.artifactId}-${project.version}-${minecraft.version}</finalName>
     </build>
 
     <profiles>
