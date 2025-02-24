@@ -22,7 +22,9 @@ package com.loohp.limbo;
 
 import cc.carm.lib.configuration.source.ConfigurationHolder;
 import cc.carm.lib.configuration.source.yaml.YAMLConfigFactory;
+import cn.ycraft.limbo.config.AllowlistConfig;
 import cn.ycraft.limbo.config.ServerConfig;
+import cn.ycraft.limbo.config.ServerMessages;
 import cn.ycraft.limbo.network.ServerConnection;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -47,6 +49,8 @@ import com.loohp.limbo.world.World;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.querz.nbt.io.NBTUtil;
@@ -119,20 +123,28 @@ public final class Limbo {
     private final ConfigurationHolder<?> messsageHolder;
     private final ConfigurationHolder<?> allowlistHolder;
 
+    private String serverHost;
+    private int serverPort;
+    private boolean onlineMode;
+
     public Limbo() throws IOException, ParseException, NumberFormatException, ClassNotFoundException, InterruptedException {
         Limbo.instance = this;
         this.unsafe = new Unsafe(this);
+        this.console = new Console(System.in, System.out, System.err);
 
         // Initialize the configuration.
         this.configHolder = YAMLConfigFactory.from("config.yml").build();
         this.configHolder.initialize(ServerConfig.class);
         this.messsageHolder = YAMLConfigFactory.from("messages.yml").build();
-        this.messsageHolder.initialize(ServerConfig.class);
+        this.messsageHolder.initialize(ServerMessages.class);
         this.allowlistHolder = YAMLConfigFactory.from("allowlist.yml").build();
-        this.allowlistHolder.initialize(ServerConfig.class);
+        this.allowlistHolder.initialize(AllowlistConfig.class);
+
+        serverHost = ServerConfig.SERVER.HOST.resolve();
+        serverPort = ServerConfig.SERVER.PORT.resolve();
+        onlineMode = ServerConfig.SERVER.ONLINE_MODE.resolve();
 
         isRunning = new AtomicBoolean(true);
-        this.console = new Console(System.in, System.out, System.err);
 
         LIMBO_IMPLEMENTATION_VERSION = getLimboVersion();
         console.sendMessage("Loading Limbo Version " + LIMBO_IMPLEMENTATION_VERSION + " on Minecraft " + SERVER_IMPLEMENTATION_VERSION);
@@ -203,8 +215,8 @@ public final class Limbo {
         }
 
         server = new ServerConnection(
-                ServerConfig.SERVER.HOST.resolve(), ServerConfig.SERVER.PORT.resolve(),
-                ServerConfig.SERVER.ONLINE_MODE.resolve(), false
+                serverHost, serverPort,
+                onlineMode, false
         );
 
         if (ServerConfig.METRICS.resolve()) {
@@ -520,4 +532,28 @@ public final class Limbo {
         }
     }
 
+
+    public String getServerHost() {
+        return serverHost;
+    }
+
+    public void setServerHost(String serverHost) {
+        this.serverHost = serverHost;
+    }
+
+    public int getServerPort() {
+        return serverPort;
+    }
+
+    public void setServerPort(int serverPort) {
+        this.serverPort = serverPort;
+    }
+
+    public boolean isOnlineMode() {
+        return onlineMode;
+    }
+
+    public void setOnlineMode(boolean onlineMode) {
+        this.onlineMode = onlineMode;
+    }
 }

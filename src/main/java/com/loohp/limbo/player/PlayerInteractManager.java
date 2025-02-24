@@ -73,7 +73,7 @@ public class PlayerInteractManager {
 			return;
 		}
 
-		int viewDistanceChunks = ServerConfig.VIEW_DISTANCE.resolve();
+		int viewDistanceChunks = ServerConfig.PLAYER.VIEW_DISTANCE.resolve();
 		int viewDistanceBlocks = viewDistanceChunks << 4;
 		Location location = player.getLocation();
 		Set<Entity> entitiesInRange = player.getWorld().getEntities().stream().filter(each -> each.getLocation().distanceSquared(location) < viewDistanceBlocks * viewDistanceBlocks).collect(Collectors.toSet());

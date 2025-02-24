@@ -62,7 +62,7 @@ public interface ServerConfig extends Configuration {
     }
 
     @HeaderComments("Configuration for players' behavior")
-    interface PLAYER {
+    interface PLAYER extends Configuration {
 
         @HeaderComments({
                 "The players' defaultGameMode.",
