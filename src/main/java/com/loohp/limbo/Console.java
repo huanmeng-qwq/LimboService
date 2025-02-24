@@ -23,7 +23,6 @@ package com.loohp.limbo;
 import cc.carm.lib.easyplugin.utils.ColorParser;
 import com.loohp.limbo.commands.CommandSender;
 import com.loohp.limbo.utils.CustomStringUtils;
-import jline.console.ConsoleReader;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.identity.Identity;
@@ -32,10 +31,11 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.Sound.Emitter;
 import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.serializer.ansi.ANSIComponentSerializer;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.TitlePart;
-import org.fusesource.jansi.Ansi;
-import org.fusesource.jansi.Ansi.Attribute;
 import org.jline.reader.*;
 import org.jline.reader.LineReader.SuggestionType;
 import org.jline.terminal.Terminal;
@@ -46,11 +46,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.Map.Entry;
 
 public class Console implements CommandSender {
-
-    protected static final Map<ChatColor, String> REPLACEMENTS = new HashMap<>();
 
     private final static String CONSOLE = "CONSOLE";
     private final static String PROMPT = "> ";
@@ -59,7 +56,7 @@ public class Console implements CommandSender {
 
     private final Terminal terminal;
     private final LineReader tabReader;
-    private final ConsoleReader reader;
+    private final LineReader reader;
 
     private final InputStream in;
     @SuppressWarnings("unused")
@@ -97,11 +94,9 @@ public class Console implements CommandSender {
         }) : err, this.logs));
         this.err = System.err;
 
-        reader = new ConsoleReader(in, out);
-        reader.setExpandEvents(false);
-        reader.setHandleUserInterrupt(false);
 
         terminal = TerminalBuilder.builder().streams(in, out).system(true).jansi(true).build();
+        reader = LineReaderBuilder.builder().terminal(terminal).build();
         tabReader = LineReaderBuilder.builder().terminal(terminal).completer(new Completer() {
             @Override
             public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
@@ -133,7 +128,7 @@ public class Console implements CommandSender {
 
     @Override
     public void sendMessage(Identity source, Component message, MessageType type) {
-        sendMessage(PlainTextComponentSerializer.plainText().serialize(message));
+        sendComponent(message);
     }
 
     @Override
@@ -201,12 +196,16 @@ public class Console implements CommandSender {
         stashLine();
         String date = new SimpleDateFormat("HH':'mm':'ss").format(new Date());
         logs.println(ColorParser.clear("[" + date + " Info] " + message));
-        try {
-            reader.getOutput().append("[" + date + " Info] " + translateToConsole(message) + "\n");
-            reader.getOutput().flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        reader.getTerminal().writer().append("[" + date + " Info] " + translateToConsole(message) + "\n");
+        reader.getTerminal().flush();
+        unstashLine();
+    }
+    public void sendComponent(Component message) {
+        stashLine();
+        String date = new SimpleDateFormat("HH':'mm':'ss").format(new Date());
+        logs.println(ColorParser.clear("[" + date + " Info] " + PlainTextComponentSerializer.plainText().serialize(message)));
+        reader.getTerminal().writer().append("[" + date + " Info] " + translateToConsole(message) + "\n");
+        reader.getTerminal().flush();
         unstashLine();
     }
 
@@ -245,37 +244,13 @@ public class Console implements CommandSender {
         }
     }
 
-    static {
-        REPLACEMENTS.put(ChatColor.BLACK, Ansi.ansi().a(Attribute.RESET).fg(Ansi.Color.BLACK).boldOff().toString());
-        REPLACEMENTS.put(ChatColor.DARK_BLUE, Ansi.ansi().a(Attribute.RESET).fg(Ansi.Color.BLUE).boldOff().toString());
-        REPLACEMENTS.put(ChatColor.DARK_GREEN, Ansi.ansi().a(Attribute.RESET).fg(Ansi.Color.GREEN).boldOff().toString());
-        REPLACEMENTS.put(ChatColor.DARK_AQUA, Ansi.ansi().a(Attribute.RESET).fg(Ansi.Color.CYAN).boldOff().toString());
-        REPLACEMENTS.put(ChatColor.DARK_RED, Ansi.ansi().a(Attribute.RESET).fg(Ansi.Color.RED).boldOff().toString());
-        REPLACEMENTS.put(ChatColor.DARK_PURPLE, Ansi.ansi().a(Attribute.RESET).fg(Ansi.Color.MAGENTA).boldOff().toString());
-        REPLACEMENTS.put(ChatColor.GOLD, Ansi.ansi().a(Attribute.RESET).fg(Ansi.Color.YELLOW).boldOff().toString());
-        REPLACEMENTS.put(ChatColor.GRAY, Ansi.ansi().a(Attribute.RESET).fg(Ansi.Color.WHITE).boldOff().toString());
-        REPLACEMENTS.put(ChatColor.DARK_GRAY, Ansi.ansi().a(Attribute.RESET).fg(Ansi.Color.BLACK).bold().toString());
-        REPLACEMENTS.put(ChatColor.BLUE, Ansi.ansi().a(Attribute.RESET).fg(Ansi.Color.BLUE).bold().toString());
-        REPLACEMENTS.put(ChatColor.GREEN, Ansi.ansi().a(Attribute.RESET).fg(Ansi.Color.GREEN).bold().toString());
-        REPLACEMENTS.put(ChatColor.AQUA, Ansi.ansi().a(Attribute.RESET).fg(Ansi.Color.CYAN).bold().toString());
-        REPLACEMENTS.put(ChatColor.RED, Ansi.ansi().a(Attribute.RESET).fg(Ansi.Color.RED).bold().toString());
-        REPLACEMENTS.put(ChatColor.LIGHT_PURPLE, Ansi.ansi().a(Attribute.RESET).fg(Ansi.Color.MAGENTA).bold().toString());
-        REPLACEMENTS.put(ChatColor.YELLOW, Ansi.ansi().a(Attribute.RESET).fg(Ansi.Color.YELLOW).bold().toString());
-        REPLACEMENTS.put(ChatColor.WHITE, Ansi.ansi().a(Attribute.RESET).fg(Ansi.Color.WHITE).bold().toString());
-        REPLACEMENTS.put(ChatColor.MAGIC, Ansi.ansi().a(Attribute.BLINK_SLOW).toString());
-        REPLACEMENTS.put(ChatColor.BOLD, Ansi.ansi().a(Attribute.UNDERLINE_DOUBLE).toString());
-        REPLACEMENTS.put(ChatColor.STRIKETHROUGH, Ansi.ansi().a(Attribute.STRIKETHROUGH_ON).toString());
-        REPLACEMENTS.put(ChatColor.UNDERLINE, Ansi.ansi().a(Attribute.UNDERLINE).toString());
-        REPLACEMENTS.put(ChatColor.ITALIC, Ansi.ansi().a(Attribute.ITALIC).toString());
-        REPLACEMENTS.put(ChatColor.RESET, Ansi.ansi().a(Attribute.RESET).toString());
+    protected static String translateToConsole(String str) {
+        TextComponent component = LegacyComponentSerializer.legacySection().deserialize(str);
+        return ANSIComponentSerializer.ansi().serialize(component);
     }
 
-    protected static String translateToConsole(String str) {
-        for (Entry<ChatColor, String> entry : REPLACEMENTS.entrySet()) {
-            str = str.replace(entry.getKey().toString(), entry.getValue());
-        }
-        str = str.replaceAll("(?i)" + ChatColor.COLOR_CHAR + "x(" + ChatColor.COLOR_CHAR + "[0-9a-f]){6}", "");
-        return str + RESET_COLOR;
+    protected static String translateToConsole(Component component) {
+        return ANSIComponentSerializer.ansi().serialize(component);
     }
 
     public static class ConsoleOutputStream extends PrintStream {
@@ -415,7 +390,6 @@ public class Console implements CommandSender {
         public PrintStream printf(Locale l, String format, Object... args) {
             console.stashLine();
             String date = new SimpleDateFormat("HH':'mm':'ss").format(new Date());
-            ConsoleTextOutput.appendText(ColorParser.clear(String.format(l, "[" + date + " Error]" + format, args)));
             logs.printf(l, ColorParser.clear("[" + date + " Error]" + format), args);
             PrintStream stream = super.printf(l, ERROR_RED + ColorParser.clear("[" + date + " Error]" + format + RESET_COLOR), args);
             console.unstashLine();

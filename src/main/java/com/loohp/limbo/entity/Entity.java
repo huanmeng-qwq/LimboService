@@ -24,12 +24,10 @@ import com.loohp.limbo.Limbo;
 import com.loohp.limbo.entity.DataWatcher.WatchableField;
 import com.loohp.limbo.entity.DataWatcher.WatchableObjectType;
 import com.loohp.limbo.location.Location;
-import com.loohp.limbo.utils.BungeecordAdventureConversionUtils;
 import com.loohp.limbo.world.World;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.md_5.bungee.api.chat.BaseComponent;
 import org.geysermc.mcprotocollib.protocol.data.game.entity.metadata.Pose;
 import org.geysermc.mcprotocollib.protocol.data.game.entity.type.EntityType;
 
@@ -134,16 +132,6 @@ public abstract class Entity implements Sound.Emitter {
 
 	public void setCustomName(Component component) {
 		this.customName = component;
-	}
-
-	@Deprecated
-	public void setCustomName(BaseComponent component) {
-		setCustomName(component == null ? null : BungeecordAdventureConversionUtils.toComponent(component));
-	}
-
-	@Deprecated
-	public void setCustomName(BaseComponent[] components) {
-		setCustomName(components == null ? null : BungeecordAdventureConversionUtils.toComponent(components));
 	}
 
 	public boolean isOnFire() {
