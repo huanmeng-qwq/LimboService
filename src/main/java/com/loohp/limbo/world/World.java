@@ -66,7 +66,7 @@ public class World {
 		
 		EMPTY_CHUNK.cleanupPalettesAndBlockStates();
 		EMPTY_CHUNK.setHeightMaps(HEIGHT_MAP.clone());
-		EMPTY_CHUNK.setBiomes(new int[256]);
+		EMPTY_CHUNK.setBiomes(new int[1024]);
 		EMPTY_CHUNK.setTileEntities(new ListTag<CompoundTag>(CompoundTag.class));
 	}
 	
@@ -92,7 +92,7 @@ public class World {
 				Chunk chunk = chunks[x][z];
 				chunk.cleanupPalettesAndBlockStates();
 				chunk.setHeightMaps(HEIGHT_MAP.clone());
-				chunk.setBiomes(new int[256]);
+				chunk.setBiomes(new int[1024]);
 				chunk.setTileEntities(new ListTag<>(CompoundTag.class));
 			}
 		}

@@ -95,7 +95,7 @@ public class Console implements CommandSender {
         this.err = System.err;
 
 
-        terminal = TerminalBuilder.builder().streams(in, out).system(true).jansi(true).build();
+        terminal = TerminalBuilder.builder().streams(in, out).jansi(true).dumb(false).build();
         reader = LineReaderBuilder.builder().terminal(terminal).build();
         tabReader = LineReaderBuilder.builder().terminal(terminal).completer(new Completer() {
             @Override
