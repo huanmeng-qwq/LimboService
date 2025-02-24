@@ -1,3 +1,11 @@
+```text
+   __   _       __        ____             _        
+  / /  (_)_ _  / /  ___  / __/__ _____  __(_)______ 
+ / /__/ /  ' \/ _ \/ _ \_\ \/ -_) __/ |/ / / __/ -_)
+/____/_/_/_/_/_.__/\___/___/\__/_/  |___/_/\__/\__/ 
+```
+README LANGUAGES [ [**English**](README.md) | [中文](README_CN.md)  ]
+
 # LimboService
 
 <img src=".doc/images/map.png" width=200px align="right" alt="Map image">
@@ -49,7 +57,8 @@ Or if you want to develop your own plugins, please see the [Development](#develo
 - Show the version of the server.
 
 # spawn [player]
-@ limbo.command.spawn / limbo.command.spawn.others
+@ limbo.command.spawn (for self)
+@ limbo.command.spawn.others
 - Teleport a player to the spawn point.
 
 # say <message>
@@ -57,7 +66,8 @@ Or if you want to develop your own plugins, please see the [Development](#develo
 - Broadcast a message to all players.
 
 # gamemode <mode> [player]
-@ limbo.command.gamemode / limbo.command.gamemode.others
+@ limbo.command.gamemode (for self)
+# limbo.command.gamemode.others
 - Change the gamemode of a player.
 
 # allowlist toggle
@@ -202,7 +212,7 @@ original project.
 
 Many thanks to Jetbrains for kindly providing a license for us to work on this and other open-source projects.
 
-[![](https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg)](https://www.jetbrains.com/?from=https://github.com/CarmJos/EasyConfiguration)
+[![](https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.svg)](https://www.jetbrains.com/?from=https://github.com/YourCraftMC/LimboService)
 
 This project currently is mainly maintained by the  [YourCraftMC(你的世界)](https://www.ycraft.cn) .
 
