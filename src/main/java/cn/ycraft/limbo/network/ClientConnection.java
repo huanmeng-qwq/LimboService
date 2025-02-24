@@ -27,6 +27,7 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.geysermc.mcprotocollib.network.Session;
+import org.geysermc.mcprotocollib.network.event.session.DisconnectingEvent;
 import org.geysermc.mcprotocollib.network.event.session.SessionAdapter;
 import org.geysermc.mcprotocollib.network.packet.Packet;
 import org.geysermc.mcprotocollib.protocol.packet.common.clientbound.ClientboundCustomPayloadPacket;
@@ -92,6 +93,13 @@ public class ClientConnection extends SessionAdapter {
                 String str = (ServerConfig.LOGS.DISPLAY_IP_ADDRESS.resolve() ? ((InetSocketAddress) inetAddress).getHostName() : "<ip address withheld>") + ":" + ((InetSocketAddress) session.getLocalAddress()).getPort();
                 Limbo.getInstance().getConsole().sendMessage("[/" + str + "] <-> Player disconnected with the reason " + PlainTextComponentSerializer.plainText().serialize(disconnectPacket.getReason()));
             }
+        }
+    }
+
+    @Override
+    public void disconnecting(DisconnectingEvent event) {
+        if (event.getCause() != null) {
+            event.getCause().printStackTrace();
         }
     }
 
