@@ -29,9 +29,9 @@
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
 
         <minecraft.version>1.21.4</minecraft.version>
+
         <deps.easyplugin.version>1.5.12</deps.easyplugin.version>
         <deps.easyconfifuration.version>4.0.6</deps.easyconfifuration.version>
-        <dir.env>.asset</dir.env>
     </properties>
 
     <groupId>cn.ycraft</groupId>
@@ -102,12 +102,6 @@
         </repository>
 
         <repository>
-            <id>maven_central</id>
-            <name>Maven Central</name>
-            <url>https://repo.maven.apache.org/maven2/</url>
-        </repository>
-
-        <repository>
             <id>opencollab</id>
             <url>https://repo.opencollab.dev/maven-snapshots</url>
         </repository>
@@ -115,6 +109,16 @@
         <repository>
             <id>opencollab-releases</id>
             <url>https://repo.opencollab.dev/maven-releases</url>
+        </repository>
+
+        <repository>
+            <id>lumine-repo</id>
+            <url>https://mvn.lumine.io/repository/maven-public/</url>
+        </repository>
+
+        <repository>
+            <id>minebench-repo</id>
+            <url>https://repo.minebench.de/</url>
         </repository>
 
         <repository>
@@ -391,27 +395,30 @@
                 </executions>
             </plugin>
             <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
                 <executions>
                     <execution>
-                        <id>copy</id>
                         <phase>package</phase>
-                        <configuration>
-                            <target>
-                                <echo message="Copy ${project.build.finalName} to dir ${dir.env}"/>
-                                <mkdir dir="${dir.env}"/>
-                                <copy todir="${dir.env}/" overwrite="true">
-                                    <fileset dir="${project.build.directory}">
-                                        <include name="${project.build.finalName}.jar"/>
-                                    </fileset>
-                                </copy>
-                            </target>
-                        </configuration>
                         <goals>
-                            <goal>run</goal>
+                            <goal>shade</goal>
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <outputDirectory>${project.basedir}/.asset/</outputDirectory>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/MANIFEST.MF</exclude>
+                                <exclude>META-INF/*.txt</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                </configuration>
             </plugin>
         </plugins>
         <finalName>${project.artifactId}-${project.version}-${minecraft.version}</finalName>

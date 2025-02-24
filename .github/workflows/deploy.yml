@@ -52,7 +52,7 @@ jobs:
         id: sitemap
         uses: cicirello/generate-sitemap@v1
         with:
-          base-url-path: https://CarmJos.github.io/EasyConfiguration
+          base-url-path: https://YourCraftMC.github.io/LimboService
           path-to-root: docs
 
       - name: "Output stats"

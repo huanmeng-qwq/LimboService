@@ -26,10 +26,7 @@ jobs:
           server-password: MAVEN_TOKEN
 
       - name: "Package"
-        run: mvn -B -Pprivate deploy --file pom.xml
-        env:
-          MAVEN_USERNAME: "carm"
-          MAVEN_TOKEN: ${{secrets.MAVEN_PASSWORD}}
+        run: mvn -B package --file pom.xml
 
       - name: "Upload artifacts"
         uses: actions/upload-artifact@v4

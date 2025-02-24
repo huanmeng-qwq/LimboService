@@ -49,8 +49,6 @@ import com.loohp.limbo.world.World;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.querz.nbt.io.NBTUtil;
@@ -214,10 +212,7 @@ public final class Limbo {
             }
         }
 
-        server = new ServerConnection(
-                serverHost, serverPort,
-                onlineMode, false
-        );
+        server = new ServerConnection(serverHost, serverPort, onlineMode, false);
 
         if (ServerConfig.METRICS.resolve()) {
             console.sendMessage("Enabling metrics....");
