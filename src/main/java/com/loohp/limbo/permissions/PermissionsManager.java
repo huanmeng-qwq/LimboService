@@ -67,9 +67,8 @@ public class PermissionsManager {
 	public boolean hasPermission(CommandSender sender, String permission) {
 		if (sender instanceof Console) {
 			return true;
-		} else if (sender instanceof Player) {
-			Player player = (Player) sender;
-			if (users.get(player.getName()) != null && users.get(player.getName()).stream().anyMatch(each -> permissions.get(each).stream().anyMatch(node -> node.equalsIgnoreCase(permission)))) {
+		} else if (sender instanceof Player player) {
+            if (users.get(player.getName()) != null && users.get(player.getName()).stream().anyMatch(each -> permissions.get(each).stream().anyMatch(node -> node.equalsIgnoreCase(permission)))) {
 				return true;
 			} else {
 				return permissions.get("default").stream().anyMatch(node -> node.equalsIgnoreCase(permission));

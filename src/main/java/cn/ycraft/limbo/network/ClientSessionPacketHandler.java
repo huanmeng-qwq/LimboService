@@ -161,12 +161,10 @@ public class ClientSessionPacketHandler extends SessionAdapter {
     }
 
     private static void checkRenameItem(Packet packet, Player player) {
-        if (packet instanceof ServerboundRenameItemPacket) {
-            ServerboundRenameItemPacket renameItemPacket = (ServerboundRenameItemPacket) packet;
-            if (player.getInventoryView().getTopInventory() instanceof AnvilInventory) {
+        if (packet instanceof ServerboundRenameItemPacket renameItemPacket) {
+            if (player.getInventoryView().getTopInventory() instanceof AnvilInventory anvilInventory) {
                 AnvilRenameInputEvent event = Limbo.getInstance().getEventsManager().callEvent(new AnvilRenameInputEvent(player.getInventoryView(), renameItemPacket.getName()));
                 if (!event.isCancelled()) {
-                    AnvilInventory anvilInventory = (AnvilInventory) player.getInventoryView().getTopInventory();
                     ItemStack result = anvilInventory.getItem(2);
                     if (result != null) {
                         result.displayName(LegacyComponentSerializer.legacySection().deserialize(event.getInput()));
@@ -177,8 +175,7 @@ public class ClientSessionPacketHandler extends SessionAdapter {
     }
 
     private static void checkPickItemFromBlock(Packet packet, Player player) {
-        if (packet instanceof ServerboundPickItemFromBlockPacket) {
-            ServerboundPickItemFromBlockPacket pickItem = (ServerboundPickItemFromBlockPacket) packet;
+        if (packet instanceof ServerboundPickItemFromBlockPacket pickItem) {
             PlayerInventory inventory = player.getInventory();
             Vector3i pos = pickItem.getPos();
             BlockState blockState = player.getWorld().getBlock(pos);
@@ -201,8 +198,7 @@ public class ClientSessionPacketHandler extends SessionAdapter {
     }
 
     private static void checkPlayerAction(Packet packet, Player player) {
-        if (packet instanceof ServerboundPlayerActionPacket) {
-            ServerboundPlayerActionPacket actionPacket = (ServerboundPlayerActionPacket) packet;
+        if (packet instanceof ServerboundPlayerActionPacket actionPacket) {
             //noinspection SwitchStatementWithTooFewBranches
             switch (actionPacket.getAction()) {
                 case SWAP_HANDS: {
@@ -219,8 +215,7 @@ public class ClientSessionPacketHandler extends SessionAdapter {
     }
 
     private static void checkCloseContainer(Packet packet, Player player) {
-        if (packet instanceof ServerboundContainerClosePacket) {
-            ServerboundContainerClosePacket close = (ServerboundContainerClosePacket) packet;
+        if (packet instanceof ServerboundContainerClosePacket close) {
             Inventory inventory = player.getInventoryView().getTopInventory();
             if (inventory != null) {
                 Integer id = inventory.getUnsafe().c().get(player);
@@ -234,8 +229,7 @@ public class ClientSessionPacketHandler extends SessionAdapter {
     }
 
     private static void checkContainerClick(Packet packet, Player player) {
-        if (packet instanceof ServerboundContainerClickPacket) {
-            ServerboundContainerClickPacket clickPacket = (ServerboundContainerClickPacket) packet;
+        if (packet instanceof ServerboundContainerClickPacket clickPacket) {
             try {
                 InventoryClickUtils.handle(player, clickPacket);
             } catch (Throwable e) {
@@ -245,8 +239,7 @@ public class ClientSessionPacketHandler extends SessionAdapter {
     }
 
     private static void checkCreativeSlot(Packet packet, Player player) {
-        if (packet instanceof ServerboundSetCreativeModeSlotPacket) {
-            ServerboundSetCreativeModeSlotPacket creativeSlot = (ServerboundSetCreativeModeSlotPacket) packet;
+        if (packet instanceof ServerboundSetCreativeModeSlotPacket creativeSlot) {
             InventoryCreativeEvent event = Limbo.getInstance().getEventsManager().callEvent(new InventoryCreativeEvent(player.getInventoryView(), player.getInventory().getUnsafe().b().applyAsInt(creativeSlot.getSlot()), ItemUtil.to(creativeSlot.getClickedItem())));
             if (event.isCancelled()) {
                 player.updateInventory();
@@ -262,8 +255,7 @@ public class ClientSessionPacketHandler extends SessionAdapter {
     }
 
     private static void checkInteractBlock(Packet packet, Player player) {
-        if (packet instanceof ServerboundUseItemOnPacket) {
-            ServerboundUseItemOnPacket useItem = (ServerboundUseItemOnPacket) packet;
+        if (packet instanceof ServerboundUseItemOnPacket useItem) {
             BlockState block = player.getWorld().getBlock(useItem.getPosition());
             Hand hand = useItem.getHand();
             EquipmentSlot slot = hand == Hand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
@@ -294,8 +286,7 @@ public class ClientSessionPacketHandler extends SessionAdapter {
     }
 
     private static void checkInteractItem(Packet packet, Player player) {
-        if (packet instanceof ServerboundUseItemPacket) {
-            ServerboundUseItemPacket itemPacket = (ServerboundUseItemPacket) packet;
+        if (packet instanceof ServerboundUseItemPacket itemPacket) {
             Hand hand = itemPacket.getHand();
             EquipmentSlot slot = hand == Hand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND;
             Limbo.getInstance().getEventsManager().callEvent(new PlayerInteractEvent(player, PlayerInteractEvent.Action.RIGHT_CLICK_AIR, player.getEquipment().getItem(slot), null, null, slot));
@@ -303,15 +294,13 @@ public class ClientSessionPacketHandler extends SessionAdapter {
     }
 
     private static void checkPluginMessage(Packet packet, Player player) {
-        if (packet instanceof ServerboundCustomPayloadPacket) {
-            ServerboundCustomPayloadPacket inPluginMessaging = (ServerboundCustomPayloadPacket) packet;
+        if (packet instanceof ServerboundCustomPayloadPacket inPluginMessaging) {
             Limbo.getInstance().getEventsManager().callEvent(new PluginMessageEvent(player, inPluginMessaging.getChannel().asString(), inPluginMessaging.getData()));
         }
     }
 
     private static void checkResourcePack(Packet packet, Player player) {
-        if (packet instanceof ServerboundResourcePackPacket) {
-            ServerboundResourcePackPacket rpcheck = (ServerboundResourcePackPacket) packet;
+        if (packet instanceof ServerboundResourcePackPacket rpcheck) {
             // Pass on result to the events
             Limbo.getInstance().getEventsManager().callEvent(new PlayerResourcePackStatusEvent(player, rpcheck.getStatus()));
             if (rpcheck.getStatus() == ResourcePackStatus.DECLINED && ServerConfig.RESOURCE_PACK.FORCE.resolve()) {
@@ -321,8 +310,7 @@ public class ClientSessionPacketHandler extends SessionAdapter {
     }
 
     private static void checkHeldSlot(Packet packet, Player player) {
-        if (packet instanceof ServerboundSetCarriedItemPacket) {
-            ServerboundSetCarriedItemPacket change = (ServerboundSetCarriedItemPacket) packet;
+        if (packet instanceof ServerboundSetCarriedItemPacket change) {
             PlayerSelectedSlotChangeEvent event = Limbo.getInstance().getEventsManager().callEvent(new PlayerSelectedSlotChangeEvent(player, (byte) change.getSlot()));
             if (event.isCancelled()) {
                 ClientboundSetHeldSlotPacket cancelPacket = new ClientboundSetHeldSlotPacket(player.getSelectedSlot());
@@ -339,22 +327,19 @@ public class ClientSessionPacketHandler extends SessionAdapter {
     }
 
     private static void checkCommand(Packet packet, Player player) {
-        if (packet instanceof ServerboundChatCommandPacket) {
-            ServerboundChatCommandPacket command = (ServerboundChatCommandPacket) packet;
+        if (packet instanceof ServerboundChatCommandPacket command) {
             Limbo.getInstance().dispatchCommand(player, "/" + command.getCommand());
         }
     }
 
     private static void checkChat(Packet packet, Player player) {
-        if (packet instanceof ServerboundChatPacket) {
-            ServerboundChatPacket chat = (ServerboundChatPacket) packet;
+        if (packet instanceof ServerboundChatPacket chat) {
             player.chat(chat.getMessage(), true, chat.getSignature(), Instant.ofEpochMilli(chat.getTimeStamp()));
         }
     }
 
     private void checkCommandSuggestions(Packet packet, Player player) {
-        if (packet instanceof ServerboundCommandSuggestionPacket) {
-            ServerboundCommandSuggestionPacket request = (ServerboundCommandSuggestionPacket) packet;
+        if (packet instanceof ServerboundCommandSuggestionPacket request) {
             String[] command = CustomStringUtils.splitStringToArgs(request.getText().substring(1));
 
             List<String> matches = new ArrayList<>(Limbo.getInstance().getPluginManager().getTabOptions(player, command));
@@ -368,8 +353,7 @@ public class ClientSessionPacketHandler extends SessionAdapter {
     }
 
     private void checkMovePacket(Packet packet, Player player) {
-        if (packet instanceof ServerboundMovePlayerPosRotPacket) {//move_player_pos_rot
-            ServerboundMovePlayerPosRotPacket pos = (ServerboundMovePlayerPosRotPacket) packet;
+        if (packet instanceof ServerboundMovePlayerPosRotPacket pos) {//move_player_pos_rot
             Location from = player.getLocation();
             Location to = new Location(player.getWorld(), pos.getX(), pos.getY(), pos.getZ(), pos.getYaw(), pos.getPitch());
 
@@ -377,8 +361,7 @@ public class ClientSessionPacketHandler extends SessionAdapter {
                 PlayerMoveEvent event = Limbo.getInstance().getEventsManager().callEvent(new PlayerMoveEvent(player, from, to));
                 processMoveEvent.accept(event, to);
             }
-        } else if (packet instanceof ServerboundMovePlayerPosPacket) {//move_player_pos
-            ServerboundMovePlayerPosPacket pos = (ServerboundMovePlayerPosPacket) packet;
+        } else if (packet instanceof ServerboundMovePlayerPosPacket pos) {//move_player_pos
             Location from = player.getLocation();
             Location to = new Location(player.getWorld(), pos.getX(), pos.getY(), pos.getZ(), player.getLocation().getYaw(), player.getLocation().getPitch());
 
@@ -386,8 +369,7 @@ public class ClientSessionPacketHandler extends SessionAdapter {
                 PlayerMoveEvent event = Limbo.getInstance().getEventsManager().callEvent(new PlayerMoveEvent(player, from, to));
                 processMoveEvent.accept(event, to);
             }
-        } else if (packet instanceof ServerboundMovePlayerRotPacket) {//move_player_rot
-            ServerboundMovePlayerRotPacket pos = (ServerboundMovePlayerRotPacket) packet;
+        } else if (packet instanceof ServerboundMovePlayerRotPacket pos) {//move_player_rot
             Location from = player.getLocation();
             Location to = new Location(player.getWorld(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ(), pos.getYaw(), pos.getPitch());
 

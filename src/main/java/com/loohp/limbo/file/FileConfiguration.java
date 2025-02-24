@@ -136,7 +136,7 @@ public class FileConfiguration {
 		pw.flush();
 		pw.close();
 		
-		String str = new String(out.toByteArray(), StandardCharsets.UTF_8);
+		String str = out.toString(StandardCharsets.UTF_8);
 		
 		return str;
 	}

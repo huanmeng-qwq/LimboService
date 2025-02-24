@@ -70,7 +70,7 @@ public class Console implements CommandSender {
         File dir = new File("logs");
         dir.mkdirs();
         File logs = new File(dir, fileName);
-        this.logs = new PrintStream(Files.newOutputStream(logs.toPath()), true, StandardCharsets.UTF_8.toString());
+        this.logs = new PrintStream(Files.newOutputStream(logs.toPath()), true, StandardCharsets.UTF_8);
 
         if (in != null) {
             System.setIn(in);

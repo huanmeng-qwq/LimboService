@@ -104,26 +104,9 @@ public class Metrics {
             startSubmitting();
         }
 
-        addCustomChart(new Metrics.SingleLineChart("players", new Callable<Integer>() {
-            @Override
-            public Integer call() throws Exception {
-                return Limbo.getInstance().getPlayers().size();
-            }
-        }));
-
-        addCustomChart(new Metrics.SimplePie("limbo_version", new Callable<String>() {
-            @Override
-            public String call() throws Exception {
-                return limboVersion;
-            }
-        }));
-
-        addCustomChart(new Metrics.SimplePie("minecraftVersion", new Callable<String>() {
-            @Override
-            public String call() throws Exception {
-                return Limbo.SERVER_IMPLEMENTATION_VERSION;
-            }
-        }));
+        addCustomChart(new Metrics.SingleLineChart("players", () -> Limbo.getInstance().getPlayers().size()));
+        addCustomChart(new Metrics.SimplePie("limbo_version", () -> limboVersion));
+        addCustomChart(new Metrics.SimplePie("minecraftVersion", () -> Limbo.SERVER_IMPLEMENTATION_VERSION));
     }
 
     /**
@@ -278,7 +261,7 @@ public class Metrics {
     /**
      * Represents a custom chart.
      */
-    public static abstract class CustomChart {
+    public abstract static class CustomChart {
 
         // The id of the chart
         final String chartId;
@@ -669,7 +652,7 @@ public class Metrics {
         protected JSONObject getChartData() {
             JSONObject data = new JSONObject();
             JSONObject values = new JSONObject();
-            HashMap<Country, Integer> map = getValues(new HashMap<Country, Integer>());
+            HashMap<Country, Integer> map = getValues(new HashMap<>());
             if (map == null || map.isEmpty()) {
                 // Null = skip the chart
                 return null;

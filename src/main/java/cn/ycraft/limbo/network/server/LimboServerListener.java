@@ -51,8 +51,7 @@ public class LimboServerListener extends ServerListener {
     public void packetReceived(Session session, Packet packet) {
         LimboProtocol protocol = (LimboProtocol) session.getPacketProtocol();
         if (protocol.getInboundState() == ProtocolState.LOGIN) {
-            if (packet instanceof ServerboundHelloPacket) {
-                ServerboundHelloPacket helloPacket = (ServerboundHelloPacket) packet;
+            if (packet instanceof ServerboundHelloPacket helloPacket) {
                 $setUsername(helloPacket.getUsername());
                 boolean isVelocityModern = ServerConfig.PROXY.VELOCITY_MODERN.resolve();
 
@@ -67,8 +66,7 @@ public class LimboServerListener extends ServerListener {
                     new Thread(() -> $auth(session, false, null)).start();
                 }
                 return;
-            } else if (packet instanceof ServerboundKeyPacket) {
-                ServerboundKeyPacket keyPacket = (ServerboundKeyPacket) packet;
+            } else if (packet instanceof ServerboundKeyPacket keyPacket) {
                 PrivateKey privateKey = $getKeyPair().getPrivate();
                 if (!Arrays.equals(this._challenge, keyPacket.getEncryptedChallenge(privateKey))) {
                     throw new IllegalStateException("Protocol error");
@@ -80,8 +78,7 @@ public class LimboServerListener extends ServerListener {
                 return;
             }
         }
-        if (packet instanceof ServerboundCustomQueryAnswerPacket) {
-            ServerboundCustomQueryAnswerPacket answerPacket = (ServerboundCustomQueryAnswerPacket) packet;
+        if (packet instanceof ServerboundCustomQueryAnswerPacket answerPacket) {
             if (answerPacket.getTransactionId() == session.getFlag(NetworkConstants.FORWARD_FLAG).id) {
                 if (answerPacket.getData() == null) {
                     session.disconnect("Invalid Login");
@@ -97,10 +94,9 @@ public class LimboServerListener extends ServerListener {
             }
         }
         if (protocol.getInboundState() == ProtocolState.HANDSHAKE) {
-            if (packet instanceof ClientIntentionPacket) {
+            if (packet instanceof ClientIntentionPacket intentionPacket) {
                 boolean isBungeeCord = ServerConfig.PROXY.BUNGEECORD.resolve();
                 boolean isBungeeGuard = ServerConfig.PROXY.BUNGEE_GUARD.resolve();
-                ClientIntentionPacket intentionPacket = (ClientIntentionPacket) packet;
                 switch (intentionPacket.getIntent()) {
                     case STATUS: {
                         protocol.setOutboundState(ProtocolState.STATUS);
