@@ -134,8 +134,10 @@ And... that's it! You can now use the LimboService API to develop your own plugi
 
 > [!NOTE]
 > You can find maven packages
-> at [GitHub Packages](https://github.com/orgs/YourCraftMC/packages?repo_name=LimboService).
-> And remember to replace `VERSION` with the version you're using configs down below.
+> at [GitHub Packages](https://github.com/orgs/YourCraftMC/packages?repo_name=LimboService)
+> and Javadocs [HERE](https://yourcraftmc.github.io/LimboService/).
+> 
+> Remember to replace `VERSION` with the version you're using configs down below.
 
 <details>
 <summary><b>Maven Dependency</b></summary>

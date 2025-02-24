@@ -132,8 +132,9 @@ description: LimboService 基础插件模板
 
 > [!NOTE]
 > 您可从 [GitHub Packages](https://github.com/orgs/YourCraftMC/packages?repo_name=LimboService)
-> 查看、获取Maven的依赖包，
-> 使用时请将下方配置中的 VERSION 替换为实际版本后。
+> 查看、获取Maven的依赖包，还可以在 [这里](https://yourcraftmc.github.io/LimboService/) 找到本项目的 Javadoc。
+> 
+> 使用时记得将下方配置中的 VERSION 替换为实际版本号。
 
 <details> <summary><b>Maven 依赖配置</b></summary>
 
