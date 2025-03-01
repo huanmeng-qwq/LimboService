@@ -18,10 +18,6 @@ public abstract class CommandHandler implements TabCompleter, NamedExecutor, Com
 
     public abstract Void noArgs(CommandSender sender);
 
-    public Void unknownCommand(CommandSender sender, String[] args) {
-        return noArgs(sender);
-    }
-
     public abstract Void noPermission(CommandSender sender);
 
     public Void onException(CommandSender sender, String cmd, Exception ex) {
@@ -52,6 +48,7 @@ public abstract class CommandHandler implements TabCompleter, NamedExecutor, Com
             noPermission(sender);
             return;
         }
+
         if (args.length == 0) {
             this.noArgs(sender);
             return;
@@ -70,22 +67,25 @@ public abstract class CommandHandler implements TabCompleter, NamedExecutor, Com
         }
 
         SubCommand<?> sub = getSubCommand(input);
-        if (sub == null) {
-            this.unknownCommand(sender, args);
-        } else if (!sub.hasPermission(sender)) {
-            this.noPermission(sender);
-        } else {
-            try {
-                sub.execute(sender, shortenArgs(args));
-            } catch (Exception ex) {
-                this.onException(sender, input, ex);
+        if (sub != null) {
+            if (!sub.hasPermission(sender)) {
+                this.noPermission(sender);
+            } else {
+                try {
+                    sub.execute(sender, shortenArgs(args));
+                } catch (Exception ex) {
+                    this.onException(sender, input, ex);
+                }
             }
         }
     }
 
     @Override
     public List<String> tabComplete(@NotNull CommandSender sender, String[] args) {
-        if (args.length == 0) return Collections.emptyList();
+        if (args.length == 0) return getExecutors().entrySet().stream()
+                .filter(e -> e.getValue().hasPermission(sender))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
 
         String input = args[0].toLowerCase();
         if (args.length == 1) {
