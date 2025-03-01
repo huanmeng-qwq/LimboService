@@ -37,6 +37,7 @@ import com.loohp.limbo.events.player.PlayerChatEvent;
 import com.loohp.limbo.events.player.PlayerTeleportEvent;
 import com.loohp.limbo.inventory.*;
 import com.loohp.limbo.location.Location;
+import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.inventory.Book;
@@ -49,6 +50,7 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.Title.Times;
 import net.kyori.adventure.title.TitlePart;
+import org.geysermc.mcprotocollib.network.packet.Packet;
 import org.geysermc.mcprotocollib.protocol.data.game.entity.player.GameMode;
 import org.geysermc.mcprotocollib.protocol.data.game.entity.player.Hand;
 import org.geysermc.mcprotocollib.protocol.data.game.entity.player.PlayerSpawnInfo;
@@ -60,6 +62,7 @@ import org.geysermc.mcprotocollib.protocol.data.game.level.notify.GameEvent;
 import org.geysermc.mcprotocollib.protocol.packet.common.clientbound.ClientboundResourcePackPushPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.ClientboundRespawnPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.ClientboundStopSoundPacket;
+import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.ClientboundSystemChatPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.ClientboundTabListPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.entity.player.ClientboundPlayerPositionPacket;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.entity.player.ClientboundSetHeldSlotPacket;
@@ -81,8 +84,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class Player extends LivingEntity implements CommandSender, InventoryHolder {
-
-    public static final String CHAT_DEFAULT_FORMAT = "<%name%> %message%";
 
     public final ClientConnection clientConnection;
     public final PlayerInteractManager playerInteractManager;
@@ -278,6 +279,21 @@ public class Player extends LivingEntity implements CommandSender, InventoryHold
     public void sendMessage(String message) {
         sendMessage(LegacyComponentSerializer.legacySection().deserialize(message));
     }
+
+    @Override
+    @SuppressWarnings({"UnstableApiUsage", "deprecation"})
+    public void sendMessage(final @NotNull Identity source, final @NotNull Component message, final @NotNull MessageType type) {
+        Packet packet;
+        switch (type) {
+            case CHAT:
+            case SYSTEM:
+            default:
+                packet = new ClientboundSystemChatPacket(message, false);
+                break;
+        }
+        clientConnection.sendPacket(packet);
+    }
+
 
     public void disconnect() {
         disconnect(Component.translatable("multiplayer.disconnect.kicked"));

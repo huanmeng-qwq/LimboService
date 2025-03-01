@@ -20,55 +20,103 @@
 
 package com.loohp.limbo.plugins;
 
+import cn.ycraft.limbo.util.SchedulerUtils;
 import com.loohp.limbo.Limbo;
+import com.loohp.limbo.commands.CommandExecutor;
+import com.loohp.limbo.events.Event;
+import com.loohp.limbo.events.Listener;
 import com.loohp.limbo.file.FileConfiguration;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Supplier;
 
 public class LimboPlugin {
 
-	private String name;
-	private File dataFolder;
-	private PluginInfo info;
-	private File pluginJar;
-	
-	protected final void setInfo(FileConfiguration file, File pluginJar) {
-		this.info = new PluginInfo(file);
-		this.name = info.getName();
-		this.dataFolder = new File(Limbo.getInstance().getPluginFolder(), name);
-		this.pluginJar = pluginJar;
-	}
-	
-	protected final File getPluginJar() {
-		return pluginJar;
-	}
+    private String name;
+    private File dataFolder;
+    private PluginInfo info;
+    private File pluginJar;
+    private SchedulerUtils schedulerUtils;
 
-	public void onLoad() {
+    protected final void setInfo(FileConfiguration file, File pluginJar) {
+        this.info = new PluginInfo(file);
+        this.name = info.getName();
+        this.dataFolder = new File(Limbo.getInstance().getPluginFolder(), name);
+        this.pluginJar = pluginJar;
+        this.schedulerUtils = new SchedulerUtils(this);
+    }
 
-	}
+    protected final File getPluginJar() {
+        return pluginJar;
+    }
 
-	public void onEnable() {
+    public void onLoad() {
 
-	}
+    }
 
-	public void onDisable() {
+    public void onEnable() {
 
-	}
+    }
 
-	public final String getName() {
-		return name;
-	}
+    public void onDisable() {
 
-	public final File getDataFolder() {
-		return new File(dataFolder.getAbsolutePath());
-	}
-	
-	public final PluginInfo getInfo() {
-		return info;
-	}
-	
-	public final Limbo getServer() {
-		return Limbo.getInstance();
-	}
+    }
+
+    public void registerListener(@NotNull Listener... listeners) {
+        Arrays.stream(listeners).forEach(listener -> getServer().getEventsManager().registerEvents(this, listener));
+    }
+
+    public void registerCommand(@NotNull CommandExecutor executor) {
+        getServer().getPluginManager().registerCommands(this, executor);
+    }
+
+    public final String getName() {
+        return name;
+    }
+
+    public final File getDataFolder() {
+        return new File(dataFolder.getAbsolutePath());
+    }
+
+    public final PluginInfo getInfo() {
+        return info;
+    }
+
+    public final Limbo getServer() {
+        return Limbo.getInstance();
+    }
+
+    public final SchedulerUtils getScheduler() {
+        return schedulerUtils;
+    }
+
+    public @NotNull <T> CompletableFuture<T> supplySync(@NotNull Supplier<T> action) {
+        CompletableFuture<T> future = new CompletableFuture<>();
+        getScheduler().run(() -> future.complete(action.get()));
+        return future;
+    }
+
+    public @NotNull <T> CompletableFuture<T> supplyAsync(@NotNull Supplier<T> action) {
+        CompletableFuture<T> future = new CompletableFuture<>();
+        getScheduler().runAsync(() -> future.complete(action.get()));
+        return future;
+    }
+
+    public @NotNull <T extends Event> CompletableFuture<T> callSync(T event) {
+        return supplySync(() -> {
+            getServer().getEventsManager().callEvent(event);
+            return event;
+        });
+    }
+
+    public @NotNull <T extends Event> CompletableFuture<T> callAsync(T event) {
+        return supplyAsync(() -> {
+            getServer().getEventsManager().callEvent(event);
+            return event;
+        });
+    }
 
 }
