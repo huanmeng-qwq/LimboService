@@ -21,6 +21,7 @@
 package com.loohp.limbo;
 
 import cc.carm.lib.configuration.source.ConfigurationHolder;
+import cc.carm.lib.configuration.source.option.StandardOptions;
 import cc.carm.lib.configuration.source.yaml.YAMLConfigFactory;
 import cn.ycraft.limbo.config.AllowlistConfig;
 import cn.ycraft.limbo.config.ServerConfig;
@@ -131,11 +132,14 @@ public final class Limbo {
         this.console = new Console(System.in, System.out, System.err);
 
         // Initialize the configuration.
-        this.configHolder = YAMLConfigFactory.from("config.yml").build();
+        this.configHolder = YAMLConfigFactory.from("config.yml")
+                .option(StandardOptions.PRELOAD, true).build();
         this.configHolder.initialize(ServerConfig.class);
-        this.messsageHolder = YAMLConfigFactory.from("messages.yml").build();
+        this.messsageHolder = YAMLConfigFactory.from("messages.yml")
+                .option(StandardOptions.PRELOAD, true).build();
         this.messsageHolder.initialize(ServerMessages.class);
-        this.allowlistHolder = YAMLConfigFactory.from("allowlist.yml").build();
+        this.allowlistHolder = YAMLConfigFactory.from("allowlist.yml")
+                .option(StandardOptions.PRELOAD, true).build();
         this.allowlistHolder.initialize(AllowlistConfig.class);
 
         serverHost = ServerConfig.SERVER.HOST.resolve();
