@@ -38,12 +38,12 @@ public class DefaultCommands extends CommandHandler {
 
     @Override
     public Void noArgs(CommandSender sender) {
-        return sendMessage(sender, ServerMessages.COMMAND_NOT_FOUND);
+        return sendMessage(sender, ServerMessages.COMMAND.UNKNOWN);
     }
 
     @Override
     public Void noPermission(CommandSender sender) {
-        return sendMessage(sender, ServerMessages.CHAT.DISABLED);
+        return sendMessage(sender, ServerMessages.COMMAND.NO_PERMISSION);
     }
 
 }

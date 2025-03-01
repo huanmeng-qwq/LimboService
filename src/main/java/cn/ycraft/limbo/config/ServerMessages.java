@@ -32,10 +32,6 @@ public interface ServerMessages extends Configuration {
             "&fPlease specify a player!"
     ).build();
 
-    ConfiguredMessage COMMAND_NOT_FOUND = create().defaults(
-            "&c&lUnkown command!"
-    ).build();
-
     interface CHAT extends Configuration {
         ConfiguredMessage DISALLOWED = create().defaults(
                 "&c&lSorry! &fYou do not have permission to chat!"
@@ -94,6 +90,17 @@ public interface ServerMessages extends Configuration {
 
         ConfiguredMessage AVAILABLE = create().defaults(
                 "&7Available modes: &fsurvival&7, &fcreative&7, &fadventure&7, &fspectator&7"
+        ).build();
+    }
+
+    interface COMMAND extends Configuration {
+
+        ConfiguredMessage UNKNOWN = create().defaults(
+                "&c&lUnknown command! &fPlease check and try again."
+        ).build();
+
+        ConfiguredMessage NO_PERMISSION = create().defaults(
+                "&c&lSorry! &fBut you do not have permission to do this!"
         ).build();
     }
 
