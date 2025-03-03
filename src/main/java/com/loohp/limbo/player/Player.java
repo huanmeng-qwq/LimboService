@@ -325,7 +325,7 @@ public class Player extends LivingEntity implements CommandSender, InventoryHold
         PlayerChatEvent event = Limbo.getInstance().getEventsManager().callEvent(new PlayerChatEvent(this, format, message, false));
         if (event.isCancelled()) return;
 
-        if (!hasPermission("limboserver.chat")) {
+        if (!hasPermission("limbo.command.chat")) {
             ServerMessages.CHAT.DISALLOWED.sendTo(this);
             return;
         }
@@ -334,8 +334,7 @@ public class Player extends LivingEntity implements CommandSender, InventoryHold
         Limbo.getInstance().getConsole().sendMessage(chat);
 
         for (Player each : Limbo.getInstance().getPlayers()) {
-            each.sendMessage(chat); // TODO Using SignedMessage.
-//            each.sendMessage(Identity.identity(uuid), Component.translatable("chat.type.text").args(Component.text(this.getName()), Component.text(event.getMessage())), MessageType.CHAT, saltSignature, time);
+            each.sendMessage(Identity.identity(uuid), Component.translatable("chat.type.text").arguments(Component.text(this.getName()), Component.text(event.getMessage())), MessageType.CHAT);
         }
 
     }
