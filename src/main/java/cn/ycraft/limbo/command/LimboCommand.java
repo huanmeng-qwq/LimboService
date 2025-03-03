@@ -14,6 +14,8 @@ import dev.rollczi.litecommands.argument.suggester.input.SuggestionInput;
 import dev.rollczi.litecommands.command.CommandRoute;
 import dev.rollczi.litecommands.input.raw.RawCommand;
 import dev.rollczi.litecommands.invocation.Invocation;
+import dev.rollczi.litecommands.meta.Meta;
+import dev.rollczi.litecommands.permission.MissingPermissions;
 import dev.rollczi.litecommands.platform.PlatformInvocationListener;
 import dev.rollczi.litecommands.platform.PlatformSender;
 import dev.rollczi.litecommands.platform.PlatformSenderFactory;
@@ -23,7 +25,9 @@ import dev.rollczi.litecommands.suggestion.SuggestionResult;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
 
 public class LimboCommand<SOURCE> {
 
@@ -43,7 +47,8 @@ public class LimboCommand<SOURCE> {
 
     public LiteralArgumentBuilder<SOURCE> toLiteral() {
         LiteralArgumentBuilder<SOURCE> baseArgument = LiteralArgumentBuilder.<SOURCE>literal(baseRoute.getName())
-            .executes(this::execute);
+                .executes(this::execute)
+                .requires(canUse());
 
         this.appendRoute(baseArgument, baseRoute);
         return baseArgument;
@@ -52,8 +57,8 @@ public class LimboCommand<SOURCE> {
     private void appendRoute(LiteralArgumentBuilder<SOURCE> baseLiteral, CommandRoute<SOURCE> route) {
         boolean isBase = route == baseRoute;
         LiteralArgumentBuilder<SOURCE> literal = isBase
-            ? baseLiteral
-            : LiteralArgumentBuilder.<SOURCE>literal(route.getName()).executes(this::execute);
+                ? baseLiteral
+                : LiteralArgumentBuilder.<SOURCE>literal(route.getName()).executes(this::execute);
 
         literal.then(this.createArguments());
 
@@ -68,9 +73,9 @@ public class LimboCommand<SOURCE> {
     @NotNull
     private RequiredArgumentBuilder<SOURCE, String> createArguments() {
         return RequiredArgumentBuilder
-            .<SOURCE, String>argument(settings.getInputInspectionDisplay(), StringArgumentType.greedyString())
-            .executes(this::execute)
-            .suggests(this::suggests);
+                .<SOURCE, String>argument(settings.getInputInspectionDisplay(), StringArgumentType.greedyString())
+                .executes(this::execute)
+                .suggests(this::suggests);
     }
 
     private int execute(CommandContext<SOURCE> context) {
@@ -103,6 +108,13 @@ public class LimboCommand<SOURCE> {
 
             return suggestionsBuilder.build();
         });
+    }
+
+    public Predicate<SOURCE> canUse() {
+        return (source) -> {
+            MissingPermissions check = MissingPermissions.check(senderFactory.create(source), baseRoute);
+            return check.isPermitted();
+        };
     }
 
     Message tooltip(String string) {

@@ -21,7 +21,9 @@ public class LimboServicePlatform extends AbstractPlatform<CommandSender, LiteLi
         CommandDispatcher<CommandSender> dispatcher = InternalCommandRegistry.getDispatcher();
         LiteralCommandNode<CommandSender> commandNode = dispatcher.register(command.toLiteral());
         for (String alias : commandRoute.getAliases()) {
-            dispatcher.register(LiteralArgumentBuilder.<CommandSender>literal(alias).redirect(commandNode));
+            dispatcher.register(LiteralArgumentBuilder.<CommandSender>literal(alias)
+                    .requires(commandNode.getRequirement())
+                    .redirect(commandNode));
         }
     }
 

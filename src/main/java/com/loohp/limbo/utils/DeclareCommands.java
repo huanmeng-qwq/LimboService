@@ -22,14 +22,14 @@ package com.loohp.limbo.utils;
 
 import cn.ycraft.limbo.command.InternalCommandRegistry;
 import com.google.common.collect.Queues;
-import com.loohp.limbo.Limbo;
 import com.loohp.limbo.commands.CommandSender;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.suggestion.Suggestion;
-import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.tree.ArgumentCommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.ints.IntSets;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMaps;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -41,20 +41,50 @@ import org.geysermc.mcprotocollib.protocol.data.game.command.CommandType;
 import org.geysermc.mcprotocollib.protocol.data.game.command.properties.StringProperties;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.ClientboundCommandsPacket;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.Queue;
+import java.util.function.BiPredicate;
 
 public class DeclareCommands {
-
     public static ClientboundCommandsPacket getDeclareCommandsPacket(CommandSender sender) {
         CommandDispatcher<CommandSender> dispatcher = InternalCommandRegistry.getDispatcher();
-        RootCommandNode<CommandSender> root = dispatcher.getRoot();
+        RootCommandNode<CommandSender> root = new RootCommandNode<>();
+
+        for (com.mojang.brigadier.tree.CommandNode<CommandSender> node : dispatcher.getRoot().getChildren()) {
+            if (node.canUse(sender))
+                root.addChild(node);
+        }
+
         Object2IntMap<com.mojang.brigadier.tree.CommandNode<CommandSender>> object2IntMap = enumerateNodes(root);
         List<CommandNode> nodes = createEntries(object2IntMap);
 
+        validateEntries(nodes);
+
         return new ClientboundCommandsPacket(nodes.toArray(new CommandNode[0]), object2IntMap.getInt(root));
+    }
+
+    private static void validateEntries(List<CommandNode> nodeDatas, BiPredicate<CommandNode, IntSet> validator) {
+        IntSet intSet = new IntOpenHashSet(IntSets.fromTo(0, nodeDatas.size()));
+
+        while (!intSet.isEmpty()) {
+            boolean bl = intSet.removeIf(i -> validator.test(nodeDatas.get(i), intSet));
+            if (!bl) {
+                throw new IllegalStateException("Server sent an impossible command tree");
+            }
+        }
+    }
+
+    private static void validateEntries(List<CommandNode> nodeDatas) {
+        validateEntries(nodeDatas, (a, indices) -> a.getRedirectIndex().isEmpty() || !indices.contains(a.getRedirectIndex().getAsInt()));
+        validateEntries(nodeDatas, (a, indices) -> {
+            for (int childIndex : a.getChildIndices()) {
+                if (indices.contains(childIndex)) {
+                    return false;
+                }
+            }
+            return true;
+        });
     }
 
     private static Object2IntMap<com.mojang.brigadier.tree.CommandNode<CommandSender>> enumerateNodes(RootCommandNode<CommandSender> commandTree) {
