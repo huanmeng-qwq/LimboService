@@ -24,65 +24,137 @@ import com.loohp.limbo.Console;
 import com.loohp.limbo.commands.CommandSender;
 import com.loohp.limbo.file.FileConfiguration;
 import com.loohp.limbo.player.Player;
+import com.loohp.limbo.utils.DeclareCommands;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PermissionsManager {
-	
-	private final Map<String, List<String>> users;
-	private final Map<String, List<String>> permissions;
-	
-	public PermissionsManager() {
-		users = new HashMap<>();
-		permissions = new HashMap<>();
-	}
-	
-	@SuppressWarnings("unchecked")
-	public void loadDefaultPermissionFile(File file) throws IOException {
-		FileConfiguration config = new FileConfiguration(file);
-		permissions.put("default", new ArrayList<>());
-		try {
-			for (Object obj : config.get("groups", Map.class).keySet()) {
-				String key = (String) obj;
-				List<String> nodes = new ArrayList<>();
-				nodes.addAll(config.get("groups." + key, List.class));
-				permissions.put(key, nodes);
-			}
-		} catch (Exception e) {}
-		try {
-			for (Object obj : config.get("players", Map.class).keySet()) {
-				String key = (String) obj;
-				List<String> groups = new ArrayList<>();
-				groups.addAll(config.get("players." + key, List.class));
-				users.put(key, groups);
-			}
-		} catch (Exception e) {}
-	}
-	
-	public boolean hasPermission(CommandSender sender, String permission) {
-		if (sender instanceof Console) {
-			return true;
-		} else if (sender instanceof Player player) {
-            if (users.get(player.getName()) != null && users.get(player.getName()).stream().anyMatch(each -> permissions.get(each).stream().anyMatch(node -> node.equalsIgnoreCase(permission)))) {
-				return true;
-			} else {
-				return permissions.get("default").stream().anyMatch(node -> node.equalsIgnoreCase(permission));
-			}
-		}
-		return false;
-	}
 
-	public Map<String, List<String>> getUsers() {
-		return users;
-	}
+    private final Map<String, List<String>> userGroups;
+    private final Map<String, Set<String>> userPermissions;
+    private final Map<String, List<String>> groupPermissions;
 
-	public Map<String, List<String>> getPermissions() {
-		return permissions;
-	}
+    private final Map<String, Set<String>> userRemovePermissions;
 
+    public PermissionsManager() {
+        userGroups = new HashMap<>();
+        userPermissions = new HashMap<>();
+        userRemovePermissions = new HashMap<>();
+        groupPermissions = new HashMap<>();
+    }
+
+    @SuppressWarnings("unchecked")
+    public void loadDefaultPermissionFile(File file) throws IOException {
+        FileConfiguration config = new FileConfiguration(file);
+        groupPermissions.put("default", new ArrayList<>());
+        try {
+            for (Object obj : config.get("groups", Map.class).keySet()) {
+                String key = (String) obj;
+                List<String> nodes = new ArrayList<>();
+                nodes.addAll(config.get("groups." + key, List.class));
+                groupPermissions.put(key, nodes);
+            }
+        } catch (Exception e) {
+        }
+        try {
+            for (Object obj : config.get("players", Map.class).keySet()) {
+                String key = (String) obj;
+                List<String> groups = new ArrayList<>();
+                groups.addAll(config.get("players." + key, List.class));
+                userGroups.put(key, groups);
+            }
+        } catch (Exception e) {
+        }
+    }
+
+    public boolean hasPermission(CommandSender sender, String checkPermission) {
+        if (sender instanceof Console) {
+            return true;
+        } else if (sender instanceof Player player) {
+            Set<String> perms = calcPermissions(player);
+            for (String perm : perms) {
+                if (isMatch(perm, checkPermission)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private Set<String> calcPermissions(Player player) {
+        Set<String> perms = new HashSet<>();
+        if (!userGroups.containsKey(player.getName())) {
+            perms.addAll(groupPermissions.getOrDefault("default", new ArrayList<>()));
+        } else {
+            for (String group : userGroups.get(player.getName())) {
+                if (groupPermissions.containsKey(group)) {
+                    perms.addAll(groupPermissions.get(group));
+                }
+            }
+        }
+        perms.addAll(userPermissions.getOrDefault(player.getName(), Collections.emptySet()));
+        perms.removeAll(userRemovePermissions.getOrDefault(player.getName(), Collections.emptySet()));
+        return perms;
+    }
+
+    public Map<String, List<String>> getUserGroups() {
+        return userGroups;
+    }
+
+    public Map<String, List<String>> getGroupPermissions() {
+        return groupPermissions;
+    }
+
+
+    public void addPermission(Player player, String permission) {
+        String name = player.getName();
+        if (!userPermissions.containsKey(name)) {
+            userPermissions.put(name, new HashSet<>());
+        }
+        userPermissions.get(name).add(permission);
+        player.clientConnection.sendPacket(DeclareCommands.getDeclareCommandsPacket(player));
+    }
+
+    public void removePermission(Player player, String permission) {
+        String name = player.getName();
+        if (!userRemovePermissions.containsKey(name)) {
+            userRemovePermissions.put(name, new HashSet<>());
+        }
+        userRemovePermissions.get(name).add(permission);
+        player.clientConnection.sendPacket(DeclareCommands.getDeclareCommandsPacket(player));
+    }
+
+    private static boolean isMatch(String exist, String target) {
+        if (exist.equals("*")) {
+            return true;
+        }
+
+        // Split pattern and target into segments
+        String[] patternSegments = exist.split("\\.");
+        String[] targetSegments = target.split("\\.");
+
+        if (exist.endsWith("*")) {
+            // Extract prefix (excluding the trailing *)
+            String prefix = exist.substring(0, exist.length() - 1);
+            String[] prefixSegments = prefix.split("\\.");
+
+            // Check if target starts with the prefix and has more segments
+            if (targetSegments.length > prefixSegments.length) {
+                int prefixLength = prefixSegments.length;
+                for (int i = 0; i < prefixLength; i++) {
+                    if (!prefixSegments[i].equals(targetSegments[i])) {
+                        return false;
+                    }
+                }
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            // Exact match without wildcard
+            return exist.equals(target);
+        }
+    }
 }

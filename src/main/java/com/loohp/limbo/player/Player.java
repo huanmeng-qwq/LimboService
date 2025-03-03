@@ -233,8 +233,7 @@ public class Player extends LivingEntity implements CommandSender, InventoryHold
 
     @Override
     public boolean hasPermission(String permission) {
-        return Limbo.getInstance().getPermissionsManager().hasPermission(this, "*")
-                || Limbo.getInstance().getPermissionsManager().hasPermission(this, permission);
+        return Limbo.getInstance().getPermissionsManager().hasPermission(this, permission);
     }
 
     @Override
