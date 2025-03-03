@@ -81,8 +81,7 @@ public class RegistryCustom {
         this.identifier = identifier;
         Map<Key, CompoundTag> entries = new LinkedHashMap<>();
         String pathStart = "data/" + identifier.namespace() + "/" + identifier.value() + "/";
-        Pattern pattern = Pattern.compile(Pattern.quote(pathStart) + ".*");
-        for (String path : ClasspathResourcesUtils.getResources(pattern)) {
+        for (String path : ClasspathResourcesUtils.getResources(pathStart)) {
             if (path.endsWith(".json")) {
                 try (InputStream inputStream = Limbo.class.getClassLoader().getResourceAsStream(path)) {
                     Key entryKey = Key.key(identifier.namespace(), path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf(".")));

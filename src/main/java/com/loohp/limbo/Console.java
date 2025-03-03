@@ -23,6 +23,9 @@ package com.loohp.limbo;
 import cc.carm.lib.easyplugin.utils.ColorParser;
 import com.loohp.limbo.commands.CommandSender;
 import com.loohp.limbo.utils.CustomStringUtils;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.suggestion.Suggestion;
+import com.mojang.brigadier.suggestion.Suggestions;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.identity.Identity;
@@ -46,6 +49,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 public class Console implements CommandSender {
 
@@ -100,10 +104,15 @@ public class Console implements CommandSender {
         tabReader = LineReaderBuilder.builder().terminal(terminal).completer(new Completer() {
             @Override
             public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
-                String[] args = CustomStringUtils.splitStringToArgs(line.line());
-                List<String> tab = Limbo.getInstance().getPluginManager().getTabOptions(Limbo.getInstance().getConsole(), args);
-                for (String each : tab) {
-                    candidates.add(new Candidate(each));
+                com.mojang.brigadier.StringReader input = new StringReader(line.line());
+                Suggestions suggestions = null;
+                try {
+                    suggestions = Limbo.getInstance().getPluginManager().suggest(Limbo.getInstance().getConsole(), input).get();
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
+                for (Suggestion each : suggestions.getList()) {
+                    candidates.add(new Candidate(each.getText()));
                 }
             }
         }).build();
@@ -217,8 +226,7 @@ public class Console implements CommandSender {
             try {
                 String command = tabReader.readLine(PROMPT).trim();
                 if (!command.isEmpty()) {
-                    String[] input = CustomStringUtils.splitStringToArgs(command);
-                    new Thread(() -> Limbo.getInstance().dispatchCommand(this, input)).start();
+                    new Thread(() -> Limbo.getInstance().dispatchCommand(this, command)).start();
                 }
             } catch (UserInterruptException e) {
                 System.exit(0);

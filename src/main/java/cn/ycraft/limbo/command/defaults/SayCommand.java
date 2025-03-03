@@ -1,53 +1,33 @@
 package cn.ycraft.limbo.command.defaults;
 
-import cn.ycraft.limbo.command.SimpleCompleter;
-import cn.ycraft.limbo.command.SubCommand;
+import cn.ycraft.limbo.command.DefaultCommands;
 import com.loohp.limbo.Console;
 import com.loohp.limbo.Limbo;
 import com.loohp.limbo.commands.CommandSender;
-import com.loohp.limbo.commands.DefaultCommands;
-import org.jetbrains.annotations.NotNull;
+import dev.rollczi.litecommands.annotations.bind.Bind;
+import dev.rollczi.litecommands.annotations.command.Command;
+import dev.rollczi.litecommands.annotations.context.Sender;
+import dev.rollczi.litecommands.annotations.execute.Execute;
+import dev.rollczi.litecommands.annotations.permission.Permission;
+import dev.rollczi.litecommands.annotations.varargs.Varargs;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
-import java.util.Arrays;
-import java.util.List;
+import static net.kyori.adventure.text.Component.text;
 
-public class SayCommand extends SubCommand<DefaultCommands> {
+@Command(name = "say")
+@Permission("limbo.command.say")
+public class SayCommand implements DefaultCommands {
 
-    public SayCommand(@NotNull DefaultCommands parent) {
-        super(parent);
-    }
+    @Execute
+    public void execute(@Bind Limbo limbo, @Sender CommandSender sender, @Varargs("messages") String messages) throws Exception {
+        String name = sender instanceof Console ? "Server" : sender.getName();
+        Component message = text()
+                .append(text("[").append(text(name)).append(text("] ")).color(NamedTextColor.GRAY))
+                .append(text(messages))
+                .build();
 
-    @Override
-    public Void execute(CommandSender sender, String[] args) throws Exception {
-        if (args.length < 1) return sendMessage(sender, "Usage: /say <messages>");
-
-        StringBuilder builder = new StringBuilder();
-        builder.append("[");
-        if (sender instanceof Console) {
-            builder.append("Server");
-        } else {
-            builder.append(sender.getName());
-        }
-        builder.append("] ");
-        builder.append(String.join(" ", Arrays.copyOfRange(args, 1, args.length)));
-
-        String message = builder.toString();
-        Limbo.getInstance().getConsole().sendMessage(message);
-        Limbo.getInstance().getPlayers().forEach(each -> each.sendMessage(message));
-        return null;
-    }
-
-
-    @Override
-    public List<String> tabComplete(CommandSender sender, String[] args) {
-        if (args.length == 1) {
-            return SimpleCompleter.players(args[0]);
-        } else return SimpleCompleter.none();
-    }
-
-    @Override
-    public boolean hasPermission(@NotNull CommandSender sender) {
-        return sender.hasPermission("limbo.command.say");
+        limbo.sendMessage(message);
     }
 
 }

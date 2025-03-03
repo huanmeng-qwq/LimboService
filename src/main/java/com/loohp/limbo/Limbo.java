@@ -31,7 +31,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.loohp.limbo.bossbar.KeyedBossBar;
 import com.loohp.limbo.commands.CommandSender;
-import com.loohp.limbo.commands.DefaultCommands;
 import com.loohp.limbo.events.EventsManager;
 import com.loohp.limbo.inventory.*;
 import com.loohp.limbo.location.Location;
@@ -42,11 +41,12 @@ import com.loohp.limbo.plugins.LimboPlugin;
 import com.loohp.limbo.plugins.PluginManager;
 import com.loohp.limbo.scheduler.LimboScheduler;
 import com.loohp.limbo.scheduler.Tick;
-import com.loohp.limbo.utils.CustomStringUtils;
 import com.loohp.limbo.utils.ImageUtils;
 import com.loohp.limbo.utils.NetworkUtils;
 import com.loohp.limbo.world.Schematic;
 import com.loohp.limbo.world.World;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.audience.ForwardingAudience;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
@@ -56,6 +56,7 @@ import net.querz.nbt.io.NBTUtil;
 import net.querz.nbt.tag.CompoundTag;
 import org.geysermc.mcprotocollib.protocol.data.game.BossBarAction;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.ClientboundBossEventPacket;
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -74,7 +75,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public final class Limbo {
+public final class Limbo implements ForwardingAudience {
 
     public static final String LIMBO_BRAND = "Limbo";
     private static Limbo instance;
@@ -196,7 +197,7 @@ public final class Limbo {
         pluginFolder = new File("plugins");
         pluginFolder.mkdirs();
 
-        pluginManager = new PluginManager(new DefaultCommands(), pluginFolder);
+        pluginManager = new PluginManager(pluginFolder);
         try {
             Method loadPluginsMethod = PluginManager.class.getDeclaredMethod("loadPlugins");
             loadPluginsMethod.setAccessible(true);
@@ -480,21 +481,11 @@ public final class Limbo {
     }
 
     public void dispatchCommand(CommandSender sender, String str) {
-        String[] command;
+        String input = str;
         if (str.startsWith("/")) {
-            command = CustomStringUtils.splitStringToArgs(str.substring(1));
-        } else {
-            command = CustomStringUtils.splitStringToArgs(str);
+            input = str.substring(1);
         }
-        dispatchCommand(sender, command);
-    }
-
-    public void dispatchCommand(CommandSender sender, String... args) {
-        try {
-            Limbo.getInstance().getPluginManager().fireExecutors(sender, args);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Limbo.getInstance().getPluginManager().dispatchCommand(sender, input);
     }
 
     private String getLimboVersion() throws IOException {
@@ -554,5 +545,13 @@ public final class Limbo {
 
     public void setOnlineMode(boolean onlineMode) {
         this.onlineMode = onlineMode;
+    }
+
+    @Override
+    public @NotNull Iterable<? extends Audience> audiences() {
+        ArrayList<Audience> list = new ArrayList<>();
+        list.add(console);
+        list.addAll(getPlayers());
+        return list;
     }
 }

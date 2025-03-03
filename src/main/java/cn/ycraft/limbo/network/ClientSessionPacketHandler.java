@@ -23,6 +23,10 @@ import com.loohp.limbo.registry.RegistryCustom;
 import com.loohp.limbo.utils.CustomStringUtils;
 import com.loohp.limbo.utils.InventoryClickUtils;
 import com.loohp.limbo.world.BlockState;
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.suggestion.Suggestion;
+import com.mojang.brigadier.suggestion.Suggestions;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -53,11 +57,13 @@ import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.Serverbound
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.inventory.*;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.serverbound.player.*;
 
+import java.beans.FeatureDescriptor;
 import java.net.InetSocketAddress;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 
 public class ClientSessionPacketHandler extends SessionAdapter {
@@ -340,15 +346,21 @@ public class ClientSessionPacketHandler extends SessionAdapter {
 
     private void checkCommandSuggestions(Packet packet, Player player) {
         if (packet instanceof ServerboundCommandSuggestionPacket request) {
-            String[] command = CustomStringUtils.splitStringToArgs(request.getText().substring(1));
+            StringReader input = new StringReader(request.getText());
+            if (input.canRead() && input.peek() == '/') {
+                input.skip();
+            }
+            CompletableFuture<Suggestions> future = Limbo.getInstance().getPluginManager().suggest(player, input);
 
-            List<String> matches = new ArrayList<>(Limbo.getInstance().getPluginManager().getTabOptions(player, command));
+            future.thenAccept(suggestions -> {
+                int start = suggestions.getRange().getStart();
+                int length = suggestions.getRange().getLength();
 
-            int start = CustomStringUtils.getIndexOfArg(request.getText(), command.length - 1) + 1;
-            int length = command[command.length - 1].length();
-
-            ClientboundCommandSuggestionsPacket response = new ClientboundCommandSuggestionsPacket(request.getTransactionId(), start, length, matches.toArray(new String[0]), matches.stream().map(Component::text).toArray(Component[]::new));
-            player.clientConnection.sendPacket(response);
+                String[] texts = suggestions.getList().stream().map(Suggestion::getText).toArray(String[]::new);
+                Component[] tooltips = suggestions.getList().stream().map(s -> Component.text(s.getTooltip().getString())).toArray(Component[]::new);
+                ClientboundCommandSuggestionsPacket response = new ClientboundCommandSuggestionsPacket(request.getTransactionId(), start, length, texts, tooltips);
+                player.clientConnection.sendPacket(response);
+            });
         }
     }
 

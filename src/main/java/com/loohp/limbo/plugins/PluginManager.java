@@ -20,36 +20,41 @@
 
 package com.loohp.limbo.plugins;
 
+import cn.ycraft.limbo.InternalPlugin;
+import cn.ycraft.limbo.command.InternalCommandRegistry;
 import com.loohp.limbo.Limbo;
-import com.loohp.limbo.commands.CommandExecutor;
 import com.loohp.limbo.commands.CommandSender;
-import com.loohp.limbo.commands.DefaultCommands;
-import com.loohp.limbo.commands.TabCompleter;
 import com.loohp.limbo.file.FileConfiguration;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.ParseResults;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.Suggestions;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class PluginManager {
 
     private final Map<String, LimboPlugin> plugins;
-    private final DefaultCommands defaultExecutor;
-    private final List<Executor> executors;
     private final File pluginFolder;
 
-    public PluginManager(DefaultCommands defaultExecutor, File pluginFolder) {
-        this.defaultExecutor = defaultExecutor;
+    public PluginManager(File pluginFolder) {
         this.pluginFolder = pluginFolder;
-        this.executors = new ArrayList<>();
         this.plugins = new LinkedHashMap<>();
     }
 
     protected void loadPlugins() {
+        InternalPlugin internalPlugin = new InternalPlugin();
+        plugins.put(internalPlugin.getName(), internalPlugin);
         for (File file : pluginFolder.listFiles()) {
             if (file.isFile() && file.getName().endsWith(".jar")) {
                 boolean found = false;
@@ -100,79 +105,24 @@ public class PluginManager {
         return plugins.get(name);
     }
 
-    public void fireExecutors(CommandSender sender, String[] args) {
-        if (args.length == 0) return;
+    public void dispatchCommand(CommandSender sender, String input) {
+        if (input.isBlank()) return;
 
-        Limbo.getInstance().getConsole().sendMessage(sender.getName() + " executed server command: /" + String.join(" ", args));
-        for (Executor entry : executors) {
-            try {
-                entry.executor.execute(sender, args);
-            } catch (Exception e) {
-                System.err.println("Error while passing command \"" + args[0] + "\" to the plugin \"" + entry.plugin.getName() + "\"");
-                e.printStackTrace();
-            }
-        }
-
-        //Execute default commands to be executed if no plugin command is found
+        Limbo.getInstance().getConsole().sendMessage(sender.getName() + " executed server command: /" + input);
         try {
-            defaultExecutor.execute(sender, args);
-        } catch (Exception e) {
-            System.err.println("Error while running default command \"" + args[0] + "\"");
-            e.printStackTrace();
+            InternalCommandRegistry.execute(sender, input);
+        } catch (CommandSyntaxException e) {
+            sender.sendMessage(Component.text(e.getMessage()).color(NamedTextColor.RED));
         }
     }
 
-    public List<String> getTabOptions(CommandSender sender, String[] args) {
-        List<String> options = new ArrayList<>();
-        try {
-            options.addAll(defaultExecutor.tabComplete(sender, args));
-        } catch (Exception e) {
-            System.err.println("Error while getting default command tab completions");
-            e.printStackTrace();
-        }
-        for (Executor entry : executors) {
-            if (entry.tab.isPresent()) {
-                try {
-                    options.addAll(entry.tab.get().tabComplete(sender, args));
-                } catch (Exception e) {
-                    System.err.println("Error while getting tab completions to the plugin \"" + entry.plugin.getName() + "\"");
-                    e.printStackTrace();
-                }
-            }
-        }
-        return options;
-    }
-
-    public void registerCommands(LimboPlugin plugin, CommandExecutor executor) {
-        executors.add(new Executor(plugin, executor));
-    }
-
-    public void unregsiterAllCommands(LimboPlugin plugin) {
-        executors.removeIf(each -> each.plugin.equals(plugin));
+    public CompletableFuture<Suggestions> suggest(CommandSender sender, StringReader input) {
+        CommandDispatcher<CommandSender> dispatcher = InternalCommandRegistry.getDispatcher();
+        ParseResults<CommandSender> parse = dispatcher.parse(input, sender);
+        return dispatcher.getCompletionSuggestions(parse);
     }
 
     public File getPluginFolder() {
         return new File(pluginFolder.getAbsolutePath());
     }
-
-    public DefaultCommands getDefaultExecutor() {
-        return defaultExecutor;
-    }
-
-    protected static class Executor {
-        public LimboPlugin plugin;
-        public CommandExecutor executor;
-        public Optional<TabCompleter> tab;
-
-        public Executor(LimboPlugin plugin, CommandExecutor executor) {
-            this.plugin = plugin;
-            this.executor = executor;
-            if (executor instanceof TabCompleter) {
-                this.tab = Optional.of((TabCompleter) executor);
-            } else {
-                this.tab = Optional.empty();
-            }
-        }
-    }
-
 }

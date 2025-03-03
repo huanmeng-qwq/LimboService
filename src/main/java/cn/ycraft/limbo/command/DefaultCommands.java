@@ -10,12 +10,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
 
-public interface NamedExecutor {
-
-    default boolean hasPermission(@NotNull CommandSender sender) {
-        return true;
-    }
-
+public interface DefaultCommands {
     default Void sendMessage(@NotNull CommandSender sender, @NotNull String... messages) {
         return sendMessage(sender, ColorParser::parse, messages);
     }
@@ -32,6 +27,4 @@ public interface NamedExecutor {
         text.sendTo(sender, values);
         return null;
     }
-
-
 }

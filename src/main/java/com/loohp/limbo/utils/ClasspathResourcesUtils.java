@@ -19,6 +19,8 @@
 
 package com.loohp.limbo.utils;
 
+import ch.qos.logback.core.util.StringUtil;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,47 +37,45 @@ import java.util.zip.ZipFile;
 public class ClasspathResourcesUtils {
 
     /**
-     * for all elements of java.class.path get a Collection of resources Pattern
-     * pattern = Pattern.compile(".*"); gets all resources
+     * for all elements of java.class.path get a Collection of resources
      *
-     * @param pattern
-     *            the pattern to match
+     * @param word the word to contains match
      * @return the resources in the order they are found
      */
-    public static Collection<String> getResources(Pattern pattern) {
+    public static Collection<String> getResources(String word) {
         List<String> retval = new ArrayList<>();
         String classPath = System.getProperty("java.class.path", ".");
         String[] classPathElements = classPath.split(File.pathSeparator);
         for (String element : classPathElements) {
-            retval.addAll(getResources(element, pattern));
+            retval.addAll(getResources(element, word));
         }
         return retval;
     }
 
-    private static Collection<String> getResources(String element, Pattern pattern) {
+    private static Collection<String> getResources(String element, String word) {
         List<String> retval = new ArrayList<>();
         File file = new File(element);
         if (file.isDirectory()) {
-            retval.addAll(getResourcesFromDirectory(file, pattern));
-        } else{
-            retval.addAll(getResourcesFromJarFile(file, pattern));
+            retval.addAll(getResourcesFromDirectory(file, word));
+        } else {
+            retval.addAll(getResourcesFromJarFile(file, word));
         }
         return retval;
     }
 
-    private static Collection<String> getResourcesFromJarFile(final File file, final Pattern pattern) {
+    private static Collection<String> getResourcesFromJarFile(final File file, final String word) {
         List<String> retval = new ArrayList<>();
         ZipFile zf;
         try {
             zf = new ZipFile(file);
-        } catch (IOException e){
+        } catch (IOException e) {
             throw new Error(e);
         }
         Enumeration<? extends ZipEntry> e = zf.entries();
         while (e.hasMoreElements()) {
             ZipEntry ze = e.nextElement();
             String fileName = ze.getName();
-            boolean accept = pattern.matcher(fileName).matches();
+            boolean accept = fileName.replace("\\", "/").contains(word);
             if (accept) {
                 retval.add(fileName);
             }
@@ -88,16 +88,16 @@ public class ClasspathResourcesUtils {
         return retval;
     }
 
-    private static Collection<String> getResourcesFromDirectory(File directory, Pattern pattern){
+    private static Collection<String> getResourcesFromDirectory(File directory, String word) {
         List<String> retval = new ArrayList<>();
         File[] fileList = directory.listFiles();
         for (File file : fileList) {
             if (file.isDirectory()) {
-                retval.addAll(getResourcesFromDirectory(file, pattern));
+                retval.addAll(getResourcesFromDirectory(file, word));
             } else {
                 try {
                     String fileName = file.getCanonicalPath();
-                    boolean accept = pattern.matcher(fileName).matches();
+                    boolean accept = fileName.replace("\\", "/").contains(word);
                     if (accept) {
                         retval.add(fileName);
                     }

@@ -102,6 +102,14 @@ public interface ServerMessages extends Configuration {
         ConfiguredMessage NO_PERMISSION = create().defaults(
                 "&c&lSorry! &fBut you do not have permission to do this!"
         ).build();
+
+        ConfiguredMessage NOT_PLAYER = create().defaults(
+                "&c&lSorry! &fBut you must be a player to do this!"
+        ).build();
+
+        ConfiguredMessage NOT_CONSOLE = create().defaults(
+                "&c&lSorry! &fBut you must be a console to do this!"
+        ).build();
     }
 
 }

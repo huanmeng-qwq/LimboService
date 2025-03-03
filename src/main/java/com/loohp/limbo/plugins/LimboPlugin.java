@@ -20,12 +20,16 @@
 
 package com.loohp.limbo.plugins;
 
+import cn.ycraft.limbo.command.LiteLimboFactory;
+import cn.ycraft.limbo.command.LiteLimboSettings;
 import cn.ycraft.limbo.util.SchedulerUtils;
 import com.loohp.limbo.Limbo;
 import com.loohp.limbo.commands.CommandExecutor;
+import com.loohp.limbo.commands.CommandSender;
 import com.loohp.limbo.events.Event;
 import com.loohp.limbo.events.Listener;
 import com.loohp.limbo.file.FileConfiguration;
+import dev.rollczi.litecommands.LiteCommandsBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -69,8 +73,8 @@ public class LimboPlugin {
         Arrays.stream(listeners).forEach(listener -> getServer().getEventsManager().registerEvents(this, listener));
     }
 
-    public void registerCommand(@NotNull CommandExecutor executor) {
-        getServer().getPluginManager().registerCommands(this, executor);
+    public <B extends LiteCommandsBuilder<CommandSender, LiteLimboSettings, B>> B commandBuilder() {
+        return LiteLimboFactory.create(this);
     }
 
     public final String getName() {

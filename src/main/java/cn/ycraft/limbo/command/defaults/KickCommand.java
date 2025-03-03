@@ -1,52 +1,40 @@
 package cn.ycraft.limbo.command.defaults;
 
-import cn.ycraft.limbo.command.SubCommand;
+import cc.carm.lib.easyplugin.utils.ColorParser;
+import cn.ycraft.limbo.command.DefaultCommands;
 import cn.ycraft.limbo.config.ServerMessages;
-import com.loohp.limbo.Limbo;
 import com.loohp.limbo.commands.CommandSender;
-import com.loohp.limbo.commands.DefaultCommands;
 import com.loohp.limbo.player.Player;
+import dev.rollczi.litecommands.annotations.argument.Arg;
+import dev.rollczi.litecommands.annotations.command.Command;
+import dev.rollczi.litecommands.annotations.context.Sender;
+import dev.rollczi.litecommands.annotations.execute.Execute;
+import dev.rollczi.litecommands.annotations.optional.OptionalArg;
+import dev.rollczi.litecommands.annotations.permission.Permission;
+import dev.rollczi.litecommands.annotations.quoted.Quoted;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
+@Command(name = "kick")
+@Permission("limbo.command.kick")
+public class KickCommand implements DefaultCommands {
 
-public class KickCommand extends SubCommand<DefaultCommands> {
-
-    public KickCommand(@NotNull DefaultCommands parent) {
-        super(parent);
-    }
-
-    @Override
-    public Void execute(CommandSender sender, String[] args) throws Exception {
-        if (args.length < 1) return sendMessage(sender, "Usage: /kick <player> [reason]");
-
-        Player player = Limbo.getInstance().getPlayer(args[0]);
-        if (player == null) return sendMessage(sender, ServerMessages.PLAYER_NOT_FOUND);
-
-        String reasonRaw = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+    @Execute
+    public void execute(@Sender CommandSender sender, @Arg("player") Player player, @Quoted @OptionalArg("reason") String reasonRaw) throws Exception {
 
         Component reason = Component.translatable("multiplayer.disconnect.kicked");
         boolean customReason = false;
 
-        if (!reasonRaw.trim().isEmpty()) {
-            reason = LegacyComponentSerializer.legacySection().deserialize(reasonRaw);
+        if (reasonRaw != null && !reasonRaw.trim().isEmpty()) {
+            reason = LegacyComponentSerializer.legacySection().deserialize(ColorParser.parse(reasonRaw));
             customReason = true;
         }
 
         player.disconnect(reason);
         if (customReason) {
-            ServerMessages.KICK.REASON.sendTo(sender, player.getName(), reasonRaw);
+            ServerMessages.KICK.REASON.sendTo(sender, player.getName(), ColorParser.parse(reasonRaw));
         } else {
             ServerMessages.KICK.PLAYER.sendTo(sender, player.getName());
         }
-
-        return null;
-    }
-
-    @Override
-    public boolean hasPermission(@NotNull CommandSender sender) {
-        return sender.hasPermission("limbo.command.kick");
     }
 }

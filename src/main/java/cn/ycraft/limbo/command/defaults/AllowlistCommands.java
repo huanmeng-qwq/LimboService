@@ -1,122 +1,72 @@
 package cn.ycraft.limbo.command.defaults;
 
-import cn.ycraft.limbo.command.CommandHandler;
-import cn.ycraft.limbo.command.SubCommand;
+import cn.ycraft.limbo.command.DefaultCommands;
 import cn.ycraft.limbo.config.AllowlistConfig;
 import cn.ycraft.limbo.config.ServerMessages;
 import com.loohp.limbo.Limbo;
 import com.loohp.limbo.commands.CommandSender;
-import org.jetbrains.annotations.NotNull;
+import dev.rollczi.litecommands.annotations.argument.Arg;
+import dev.rollczi.litecommands.annotations.bind.Bind;
+import dev.rollczi.litecommands.annotations.command.Command;
+import dev.rollczi.litecommands.annotations.context.Sender;
+import dev.rollczi.litecommands.annotations.execute.Execute;
+import dev.rollczi.litecommands.annotations.permission.Permission;
 
 import java.util.UUID;
-import java.util.function.BiConsumer;
 
-public class AllowlistCommands extends CommandHandler {
-
-    public AllowlistCommands() {
-        registerSubCommand(new OperateCommand(this, (sender, name) -> {
-            AllowlistConfig.BY_NAME.add(name);
-            ServerMessages.ALLOWLIST.ADD.sendTo(sender, name);
-        }, (sender, uuid) -> {
-            AllowlistConfig.BY_UUID.add(uuid);
-            ServerMessages.ALLOWLIST.ADD.sendTo(sender, uuid.toString());
-        }), "add");
-        registerSubCommand(new OperateCommand(this, (sender, name) -> {
-            AllowlistConfig.BY_NAME.removeIf(v -> v.equalsIgnoreCase(name));
-            ServerMessages.ALLOWLIST.REMOVE.sendTo(sender, name);
-        }, (sender, uuid) -> {
-            AllowlistConfig.BY_UUID.remove(uuid);
-            ServerMessages.ALLOWLIST.REMOVE.sendTo(sender, uuid.toString());
-        }), "remove");
-        registerSubCommand(new ToggleCommand(this), "toggle");
-    }
-
-    @Override
-    public Void noArgs(CommandSender sender) {
-        sender.sendMessage("Usages:");
-        sender.sendMessage("- /allowlist toggle");
-        sender.sendMessage("- /allowlist reload");
-        sender.sendMessage("- /allowlist add <name/uuid>");
-        sender.sendMessage("- /allowlist remove <name/uuid>");
-        return null;
-    }
-
-    @Override
-    public Void noPermission(CommandSender sender) {
-        return sendMessage(sender, ServerMessages.NO_PERMISSION);
-    }
-
-    @Override
-    public boolean hasPermission(@NotNull CommandSender sender) {
-        return sender.hasPermission("limbo.command.whitelist");
-    }
-
-    static class OperateCommand extends SubCommand<AllowlistCommands> {
-
-        protected final BiConsumer<CommandSender, String> nameConsumer;
-        protected final BiConsumer<CommandSender, UUID> uuidConsumer;
-
-        public OperateCommand(AllowlistCommands parent, BiConsumer<CommandSender, String> nameConsumer, BiConsumer<CommandSender, UUID> uuidConsumer) {
-            super(parent);
-            this.nameConsumer = nameConsumer;
-            this.uuidConsumer = uuidConsumer;
-        }
-
-        @Override
-        public Void execute(CommandSender sender, String[] args) {
-            if (args.length != 1) return getParent().noArgs(sender);
-
-            String input = args[0];
-            if (input.length() <= 16 && input.length() >= 3) {
-                nameConsumer.accept(sender, input);
-                return null;
-            }
-
-            try {
-                UUID uuid = UUID.fromString(input);
-                uuidConsumer.accept(sender, uuid);
-                return null;
-            } catch (IllegalArgumentException e) {
-                return sendMessage(sender, "Username should be 3-16 characters long, and UUID should be 36 characters long with '-'.");
-            }
-
+@Command(name = "allowlist")
+@Permission("limbo.command.allowlist")
+public class AllowlistCommands implements DefaultCommands {
+    @Execute(name = "toggle")
+    void toggle(@Sender CommandSender sender) {
+        boolean current = AllowlistConfig.REVERSED.resolve();
+        AllowlistConfig.REVERSED.set(!current);
+        if (AllowlistConfig.REVERSED.resolve()) {
+            ServerMessages.ALLOWLIST.DENYING.sendTo(sender);
+        } else {
+            ServerMessages.ALLOWLIST.ALLOWING.sendTo(sender);
         }
     }
 
-    static class ToggleCommand extends SubCommand<AllowlistCommands> {
-
-        public ToggleCommand(AllowlistCommands parent) {
-            super(parent);
+    @Execute(name = "reload")
+    public void reload(@Sender CommandSender sender) {
+        try {
+            Limbo.getInstance().getAllowlistHolder().reload();
+        } catch (Exception ignored) {
         }
-
-        @Override
-        public Void execute(CommandSender sender, String[] args) {
-            boolean current = AllowlistConfig.REVERSED.resolve();
-            AllowlistConfig.REVERSED.set(!current);
-            if (AllowlistConfig.REVERSED.resolve()) {
-                ServerMessages.ALLOWLIST.DENYING.sendTo(sender);
-            } else {
-                ServerMessages.ALLOWLIST.ALLOWING.sendTo(sender);
-            }
-            return null;
-        }
+        sendMessage(sender, ServerMessages.ALLOWLIST.RELOADED, AllowlistConfig.size());
     }
 
-    static class ReloadCommand extends SubCommand<AllowlistCommands> {
+    @Execute(name = "add")
+    public void addEntry(@Bind Limbo limbo, @Sender CommandSender sender, @Arg("uuid") UUID uuid) throws Exception {
+        AllowlistConfig.BY_UUID.add(uuid);
+        ServerMessages.ALLOWLIST.ADD.sendTo(sender, uuid.toString());
 
-        public ReloadCommand(AllowlistCommands parent) {
-            super(parent);
-        }
-
-        @Override
-        public Void execute(CommandSender sender, String[] args) {
-            try {
-                Limbo.getInstance().getAllowlistHolder().reload();
-            } catch (Exception e) {
-            }
-            return sendMessage(sender, ServerMessages.ALLOWLIST.RELOADED, AllowlistConfig.size());
-        }
-
+        limbo.getAllowlistHolder().save();
     }
 
+    @Execute(name = "add")
+    public void addEntry(@Bind Limbo limbo, @Sender CommandSender sender, @Arg("name") String name) throws Exception {
+        AllowlistConfig.BY_NAME.add(name);
+        ServerMessages.ALLOWLIST.ADD.sendTo(sender, name);
+
+        limbo.getAllowlistHolder().save();
+    }
+
+
+    @Execute(name = "remove")
+    public void removeEntry(@Bind Limbo limbo, @Sender CommandSender sender, @Arg("uuid") UUID uuid) throws Exception {
+        AllowlistConfig.BY_UUID.remove(uuid);
+        ServerMessages.ALLOWLIST.REMOVE.sendTo(sender, uuid.toString());
+
+        limbo.getAllowlistHolder().save();
+    }
+
+    @Execute(name = "remove")
+    public void removeEntry(@Bind Limbo limbo, @Sender CommandSender sender, @Arg("name") String name) throws Exception {
+        AllowlistConfig.BY_NAME.removeIf(str -> str.equalsIgnoreCase(name));
+        ServerMessages.ALLOWLIST.REMOVE.sendTo(sender, name);
+
+        limbo.getAllowlistHolder().save();
+    }
 }
