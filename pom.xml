@@ -31,7 +31,8 @@
         <minecraft.version>1.21.4</minecraft.version>
 
         <deps.easyplugin.version>1.5.12</deps.easyplugin.version>
-        <deps.easyconfifuration.version>4.0.11</deps.easyconfifuration.version>
+        <deps.configured.version>4.0.11</deps.configured.version>
+        <deps.litecommands.version>3.9.7</deps.litecommands.version>
     </properties>
 
     <groupId>cn.ycraft</groupId>
@@ -235,14 +236,14 @@
         <dependency>
             <groupId>cc.carm.lib</groupId>
             <artifactId>easyconfiguration-feature-text</artifactId>
-            <version>${deps.easyconfifuration.version}</version>
+            <version>${deps.configured.version}</version>
             <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>cc.carm.lib</groupId>
             <artifactId>easyconfiguration-yaml</artifactId>
-            <version>${deps.easyconfifuration.version}</version>
+            <version>${deps.configured.version}</version>
             <scope>compile</scope>
         </dependency>
 
@@ -271,7 +272,7 @@
         <dependency>
             <groupId>dev.rollczi</groupId>
             <artifactId>litecommands-framework</artifactId>
-            <version>3.9.7</version>
+            <version>${deps.litecommands.version}</version>
         </dependency>
 
         <dependency>

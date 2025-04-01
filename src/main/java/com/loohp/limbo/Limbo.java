@@ -162,7 +162,7 @@ public final class Limbo implements ForwardingAudience {
         worlds.add(loadDefaultWorld());
         Location spawn = ServerConfig.WORLD.SPAWNPOINT.resolve();
         ServerConfig.WORLD.SPAWNPOINT.set(new Location(
-                getWorld(ServerConfig.getLevelName().value()),
+                getWorld(ServerConfig.getLevelName()),
                 spawn.getX(), spawn.getY(), spawn.getZ(),
                 spawn.getYaw(), spawn.getPitch())
         );
@@ -299,11 +299,11 @@ public final class Limbo implements ForwardingAudience {
 
         try {
             World world = Schematic.toWorld(
-                    ServerConfig.getLevelName().value(),
+                    ServerConfig.getLevelName(),
                     ServerConfig.WORLD.DIMENSION.resolve(),
                     (CompoundTag) NBTUtil.read(schem).getTag()
             );
-            console.sendMessage("Loaded world " + ServerConfig.getLevelName() + "!");
+            console.sendMessage("Loaded world " + ServerConfig.getLevelName() + "! (" + ServerConfig.WORLD.DIMENSION.resolve().getKey().value() + ")");
             return world;
         } catch (Throwable e) {
             console.sendMessage("Unable to load world " + ServerConfig.getSchematicFile() + "!");

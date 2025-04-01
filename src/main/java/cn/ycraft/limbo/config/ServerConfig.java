@@ -155,7 +155,8 @@ public interface ServerConfig extends Configuration {
                         section.getDouble("x", 0.0),
                         section.getDouble("y", 0.0),
                         section.getDouble("z", 0.0),
-                        section.getFloat("yaw", 0f), section.getFloat("pitch", 0f)
+                        section.getFloat("yaw", 0f),
+                        section.getFloat("pitch", 0f)
                 )).serialize((holder, data, loc) -> {
                     data.put("x", loc.getX());
                     data.put("y", loc.getY());
@@ -190,8 +191,8 @@ public interface ServerConfig extends Configuration {
         return WORLD.LEVEL.resolve().split(";")[1];
     }
 
-    static Key getLevelName() {
-        return Key.key(WORLD.LEVEL.resolve().split(";")[0]);
+    static String getLevelName() {
+        return WORLD.LEVEL.resolve().split(";")[0];
     }
 
 }
