@@ -201,7 +201,8 @@ dependencies {
 
 - [**MCProtocolLib**](https://github.com/GeyserMC/MCProtocolLib): Used to implement base MineCraft Server functions.
 - [**adventure**](https://github.com/KyoriPowered/adventure): Used to implement message components.
-- [**EasyConfiguration**](https://github.com/CarmJos/EasyConfiguration/pull/101): Used to implement configurations.
+- [**configured**](https://github.com/CarmJos/configured): Used to implement configurations.
+- [**LiteCommands**](https://github.com/Rollczi/LiteCommands): Used to implement command systems.
 - [**EasyPlugin-Color**](https://github.com/CarmJos/EasyPlugin): Used to parse generic color codes.
 
 For more dependencies, please see  [Dependencies](https://github.com/YourCraftMC/LimboService/network/dependencies) .

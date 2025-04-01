@@ -189,7 +189,8 @@ dependencies {
 ## 第三方开源库依赖
 - [**MCProtocolLib**](https://github.com/GeyserMC/MCProtocolLib): 用于实现基本的 MineCraft 游戏功能。
 - [**adventure**](https://github.com/KyoriPowered/adventure): 消息组件功能支持。
-- [**EasyConfiguration**](https://github.com/CarmJos/EasyConfiguration/pull/101): 配置文件实现。
+- [**configured**](https://github.com/CarmJos/EasyConfiguration/pull/101): 用于实现配置文件相关功能。
+- [**LiteCommands**](https://github.com/Rollczi/LiteCommands): 用于实现现有的指令系统。
 - [**EasyPlugin-Color**](https://github.com/CarmJos/EasyPlugin): 通用颜色代码解析支持。
 
 完整依赖列表请参见 [依赖关系图](https://github.com/YourCraftMC/LimboService/network/dependencies)。
