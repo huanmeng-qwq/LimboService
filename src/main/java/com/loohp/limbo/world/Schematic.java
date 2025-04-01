@@ -176,7 +176,8 @@ public class Schematic {
                         ListTag<CompoundTag> newTag = chunk.getTileEntities();
                         CompoundTag data = tag.getCompoundTag("Data");
                         data.remove("id");
-                        newTag.add(data);
+                        data.putIntArray("Pos", pos);
+                        newTag.add(SchematicConversionUtils.toTileEntityTag(data));
                         chunk.setTileEntities(newTag);
                         itr.remove();
                         break;

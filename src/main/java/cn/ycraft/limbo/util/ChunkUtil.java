@@ -1,5 +1,6 @@
 package cn.ycraft.limbo.util;
 
+import com.loohp.limbo.Limbo;
 import com.loohp.limbo.registry.BuiltInRegistries;
 import com.loohp.limbo.utils.BitsUtils;
 import com.loohp.limbo.world.Environment;
@@ -20,14 +21,21 @@ import org.geysermc.mcprotocollib.protocol.data.game.level.block.BlockEntityInfo
 import org.geysermc.mcprotocollib.protocol.data.game.level.block.BlockEntityType;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.level.ClientboundLevelChunkWithLightPacket;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ChunkUtil {
+    private static final Logger log = LoggerFactory.getLogger(ChunkUtil.class);
+
     public static ClientboundLevelChunkWithLightPacket create(int chunkX, int chunkZ, Chunk chunk, Environment environment, List<Byte[]> skylightArrays, List<Byte[]> blocklightArrays) {
 
         BitSet skyLightBitSet = new BitSet();
@@ -60,10 +68,15 @@ public class ChunkUtil {
             int x = each.getInt("x") % 16;
             int y = each.getInt("y");
             int z = each.getInt("z") % 16;
-            Integer id = BuiltInRegistries.BLOCK_ENTITY_TYPE.getId(Key.key(chunk.getBlockStateAt(x, y, z).getString("Name")));
+            Key blockId = Key.key(chunk.getBlockStateAt(x, y, z).getString("Name"));
+            Integer id = BuiltInRegistries.BLOCK_ENTITY_TYPE.getId(blockId);
+            BlockEntityType blockEntityType = BlockEntityType.from(id);
+            if (blockEntityType == null) {
+                Limbo.getInstance().getConsole().sendMessage("Unknown block entity type: " + blockId);
+            }
             blockEntities[index] = new BlockEntityInfo(
                     x, y, z,
-                    BlockEntityType.from(id),
+                    blockEntityType,
                     (NbtMap) convert(each)
             );
 
