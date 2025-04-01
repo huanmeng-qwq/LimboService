@@ -126,12 +126,13 @@ public interface ServerConfig extends Configuration {
 
         @HeaderComments({
                 "Whether this server is behind a velocity proxy with modern player forwarding",
-                "Mutually exclusive with bungeecord and bungee-guard"
+                "Mutually exclusive with BungeeCord and bungee-guard"
         })
         ConfiguredValue<Boolean> VELOCITY_MODERN = ConfiguredValue.of(false);
 
-        @HeaderComments("For Velocity Modern Forwarding or BungeeGuard a list (separated by `;`) of valid secrets")
-        ConfiguredList<String> FORWARDING_SECRETS = ConfiguredList.builderOf(String.class).fromString().defaults().build();
+        @HeaderComments("For Velocity Modern Forwarding or BungeeGuard a list of valid secrets")
+        ConfiguredList<String> FORWARDING_SECRETS = ConfiguredList.builderOf(String.class)
+                .fromString().defaults().build();
 
     }
 
@@ -185,7 +186,7 @@ public interface ServerConfig extends Configuration {
 
     }
 
-    static String getSchemFileName() {
+    static String getSchematicFile() {
         return WORLD.LEVEL.resolve().split(";")[1];
     }
 

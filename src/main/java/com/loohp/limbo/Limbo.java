@@ -154,9 +154,9 @@ public final class Limbo implements ForwardingAudience {
         reloadConfig();
 
         if (!ServerConfig.PROXY.BUNGEECORD.resolve()) {
-            console.sendMessage("If you are using bungeecord, consider turning that on in the settings!");
+            console.sendMessage("If you are using BungeeCord, consider turning that on in the settings!");
         } else {
-            console.sendMessage("Starting Limbo server in bungeecord mode!");
+            console.sendMessage("Starting Limbo server in BungeeCord mode!");
         }
 
         worlds.add(loadDefaultWorld());
@@ -283,12 +283,12 @@ public final class Limbo implements ForwardingAudience {
     }
 
     private World loadDefaultWorld() throws IOException {
-        console.sendMessage("Loading world " + ServerConfig.getLevelName() + " with the schematic file " + ServerConfig.getSchemFileName() + " ...");
+        console.sendMessage("Loading world " + ServerConfig.getLevelName() + " with the schematic file " + ServerConfig.getSchematicFile() + " ...");
 
-        File schem = new File(ServerConfig.getSchemFileName());
+        File schem = new File(ServerConfig.getSchematicFile());
 
         if (!schem.exists()) {
-            console.sendMessage("Schemetic file " + ServerConfig.getSchemFileName() + " for world " + ServerConfig.getLevelName() + " not found!");
+            console.sendMessage("Schemetic file " + ServerConfig.getSchematicFile() + " for world " + ServerConfig.getLevelName() + " not found!");
             console.sendMessage("Creating default world...");
             try (InputStream in = Limbo.class.getClassLoader().getResourceAsStream("spawn.schem")) {
                 Files.copy(in, schem.toPath());
@@ -306,7 +306,7 @@ public final class Limbo implements ForwardingAudience {
             console.sendMessage("Loaded world " + ServerConfig.getLevelName() + "!");
             return world;
         } catch (Throwable e) {
-            console.sendMessage("Unable to load world " + ServerConfig.getSchemFileName() + "!");
+            console.sendMessage("Unable to load world " + ServerConfig.getSchematicFile() + "!");
             e.printStackTrace();
             console.sendMessage("Server will exit!");
             System.exit(1);

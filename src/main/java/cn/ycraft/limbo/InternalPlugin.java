@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class InternalPlugin extends LimboPlugin {
+
     {
         try {
             FileConfiguration config = new FileConfiguration(new File("internal-plugin.yml"));
@@ -32,7 +33,7 @@ public class InternalPlugin extends LimboPlugin {
                         new SpawnCommand(),
                         new StopCommand(),
                         new VersionCommand()
-                        )
+                )
                 .build();
     }
 }

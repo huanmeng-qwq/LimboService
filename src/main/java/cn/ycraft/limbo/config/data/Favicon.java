@@ -8,24 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.file.Files;
 
-public class Favicon {
-
-
-    protected final @NotNull String path;
-    protected final byte[] data;
-
-    public Favicon(@NotNull String path, byte[] data) {
-        this.path = path;
-        this.data = data;
-    }
-
-    public @NotNull String path() {
-        return path;
-    }
-
-    public byte[] data() {
-        return data;
-    }
+public record Favicon(@NotNull String path, byte[] data) {
 
     public static Favicon load(@NotNull String path) {
         File png = new File(path);
@@ -46,6 +29,5 @@ public class Favicon {
         }
         return new Favicon(path, data);
     }
-
 
 }

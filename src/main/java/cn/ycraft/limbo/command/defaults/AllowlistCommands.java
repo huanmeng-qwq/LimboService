@@ -17,6 +17,7 @@ import java.util.UUID;
 @Command(name = "allowlist")
 @Permission("limbo.command.allowlist")
 public class AllowlistCommands implements DefaultCommands {
+
     @Execute(name = "toggle")
     void toggle(@Sender CommandSender sender) {
         boolean current = AllowlistConfig.REVERSED.resolve();
@@ -69,4 +70,5 @@ public class AllowlistCommands implements DefaultCommands {
 
         limbo.getAllowlistHolder().save();
     }
+    
 }

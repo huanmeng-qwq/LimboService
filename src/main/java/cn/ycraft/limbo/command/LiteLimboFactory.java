@@ -29,23 +29,22 @@ public class LiteLimboFactory {
     public static <B extends LiteCommandsBuilder<CommandSender, LiteLimboSettings, B>> B create(LimboPlugin plugin) {
         return (B) LiteCommandsFactory.builder(CommandSender.class, new LimboServicePlatform(new LiteLimboSettings()))
                 .self((builder, internal) -> {
-                    builder.bind(Limbo.class, Limbo::getInstance)
-                            .bind(LimboScheduler.class, () -> Limbo.getInstance().getScheduler())
-                            .bind(SchedulerUtils.class, plugin::getScheduler)
+                    builder.bind(Limbo.class, Limbo::getInstance);
+                    builder.bind(LimboScheduler.class, () -> Limbo.getInstance().getScheduler());
+                    builder.bind(SchedulerUtils.class, plugin::getScheduler);
 
-                            .context(Player.class, new SenderOnlyContextProvider<>(Player.class, () -> ServerMessages.COMMAND.NOT_PLAYER))
-                            .context(Console.class, new SenderOnlyContextProvider<>(Console.class, () -> ServerMessages.COMMAND.NOT_CONSOLE))
-                            .context(World.class, new WorldContext(() -> ServerMessages.COMMAND.NOT_PLAYER))
-                            .context(Location.class, new LocationContext(() -> ServerMessages.COMMAND.NOT_PLAYER))
+                    builder.context(Player.class, new SenderOnlyContextProvider<>(Player.class, () -> ServerMessages.COMMAND.NOT_PLAYER));
+                    builder.context(Console.class, new SenderOnlyContextProvider<>(Console.class, () -> ServerMessages.COMMAND.NOT_CONSOLE));
+                    builder.context(World.class, new WorldContext(() -> ServerMessages.COMMAND.NOT_PLAYER));
+                    builder.context(Location.class, new LocationContext(() -> ServerMessages.COMMAND.NOT_PLAYER));
 
-                            .argument(Player.class, new PlayerArgument())
-                            .argument(GameMode.class, new GameModeArgument())
+                    builder.argument(Player.class, new PlayerArgument());
+                    builder.argument(GameMode.class, new GameModeArgument());
 
-                            .result(String.class, new StringResultHandler())
-                            .result(ConfiguredMessage.class, new ConfiguredMessageResultHandler())
+                    builder.result(String.class, new StringResultHandler());
+                    builder.result(ConfiguredMessage.class, new ConfiguredMessageResultHandler());
 
-                            .message(LiteMessages.MISSING_PERMISSIONS, ServerMessages.NO_PERMISSION)
-                    ;
+                    builder.message(LiteMessages.MISSING_PERMISSIONS, ServerMessages.NO_PERMISSION);
                 });
     }
 }
