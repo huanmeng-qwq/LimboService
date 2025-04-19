@@ -65,7 +65,7 @@ public class Metrics {
     private final List<CustomChart> charts = new ArrayList<>();
 
     public Metrics() throws IOException {
-        name = "Limbo";
+        name = "LimboService";
 
         // Get the config file
         File configFile = new File("plugins/bStats", "config.yml");

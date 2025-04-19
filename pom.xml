@@ -37,10 +37,10 @@
 
     <groupId>cn.ycraft</groupId>
     <artifactId>limboservice</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 
     <name>LimboService</name>
-    <description>A lightweight &amp; standalone LIMBO service for Minecraft.</description>
+    <description>A lightweight and standalone LIMBO service for Minecraft.</description>
     <url>https://github.com/YourCraftMC/LimboService/</url>
     <packaging>jar</packaging>
 
