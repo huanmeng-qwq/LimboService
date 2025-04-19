@@ -89,6 +89,12 @@ README LANGUAGES [ [English](README.md) | [**中文**](README_CN.md)  ]
 - 关闭服务器
 ```
 
+## 统计数据
+
+> LimboService 使用 [bStats](https://bstats.org/) 进行匿名数据统计。
+
+![bStats](https://bstats.org/signatures/server-implementation/LimboService.svg)
+
 ## 开发指南
 
 LimboService 可作为开发库使用，其插件开发模式与 Bukkit/Spigot 类似。

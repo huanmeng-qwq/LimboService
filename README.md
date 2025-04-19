@@ -91,6 +91,12 @@ Or if you want to develop your own plugins, please see the [Development](#develo
 - Stop the server.
 ```
 
+## Metrics
+
+> LimboService uses [bStats](https://bstats.org/) to collect anonymous usage statistics.
+
+![bStats](https://bstats.org/signatures/server-implementation/LimboService.svg)
+
 ## Development
 
 LimboService also supports to be used as a library to develop your own plugins, just like Bukkit/Spigot does.
